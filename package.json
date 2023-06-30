@@ -1,0 +1,24 @@
+{
+  "name": "mcstatic",
+  "version": "0.0.1",
+  "description": "A custom server for Minecraft Classic and Classicube, written in TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/727021/MCStatic.git"
+  },
+  "author": "727021",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/727021/MCStatic/issues"
+  },
+  "homepage": "https://github.com/727021/MCStatic#readme",
+  "devDependencies": {
+    "@types/node": "^20.3.2",
+    "typescript": "^5.1.6"
+  }
+}
