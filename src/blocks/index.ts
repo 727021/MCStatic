@@ -1,3 +1,9 @@
+type BlockPropertiesOptions = {
+    isTransparent?: boolean
+    hasCollision?: boolean
+    showAsBlock?: Block
+}
+
 export class BlockProperties {
     //#region Presets
     static readonly DEFAULT = new BlockProperties()
@@ -8,14 +14,14 @@ export class BlockProperties {
     readonly hasCollision: boolean
     readonly showAsBlock?: Block
 
-    constructor(options: {
-        isTransparent?: boolean,
-        hasCollision?: boolean,
-        showAsBlock?: Block
-    } = {}) {
-        this.isTransparent = options.isTransparent ?? false
-        this.hasCollision = options.hasCollision ?? true
-        this.showAsBlock = options.showAsBlock
+    constructor({
+        isTransparent = false,
+        hasCollision = true,
+        showAsBlock
+    }: BlockPropertiesOptions = {}) {
+        this.isTransparent = isTransparent
+        this.hasCollision = hasCollision
+        this.showAsBlock = showAsBlock
     }
 }
 
@@ -85,7 +91,7 @@ export class Block {
     static readonly OBSIDIAN            = Block.register(49, 'block.obsidian')!
     //#endregion
 
-    constructor(readonly id: number, readonly name: string, readonly properties: BlockProperties = BlockProperties.DEFAULT) {
+    private constructor(readonly id: number, readonly name: string, readonly properties: BlockProperties = BlockProperties.DEFAULT) {
         if (Block.#allBlocks.has(id)) {
             // TODO: Actual error logging
             throw new Error('error.block.duplicate_id')

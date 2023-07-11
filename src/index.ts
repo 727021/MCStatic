@@ -1,7 +1,7 @@
 import { Level } from "./levels";
 
 Level.create({
-    name: '',
+    name: 'My Level',
     width: 2,
     height: 2,
     depth: 2,
@@ -14,5 +14,9 @@ Level.create({
     }
 }).then(lvl => {
     console.log('done')
+    Level.load('My Level').then(loaded => {
+        console.log(Level.loaded)
+        loaded?.unload()
+        console.log(Level.loaded)
+    })
 })
-
