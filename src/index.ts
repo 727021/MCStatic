@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Level } from "./levels";
 import { Server } from './server'
 

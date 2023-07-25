@@ -34,11 +34,19 @@ export class Block {
     static register(id: number, name: string, properties?: BlockProperties): Block | undefined {
         try {
             return new Block(id, name, properties)
-        } catch {}
+        } catch { /**/ }
+    }
+
+    static find(id?: number) {
+        if (id === undefined) {
+            return
+        }
+        return this.allBlocks.get(id)
     }
 
     //#region Block definitions
     // Core blocks are defined first, so they will never have duplicate ids and therefore will never be undefined.
+    /* eslint-disable @typescript-eslint/no-non-null-assertion */
     static readonly AIR                 = Block.register(0, 'block.air', new BlockProperties({ hasCollision: false, isTransparent: true }))!
     static readonly STONE               = Block.register(1, 'block.stone')!
     static readonly GRASS               = Block.register(2, 'block.grass')!
@@ -89,6 +97,7 @@ export class Block {
     static readonly BOOKSHELF           = Block.register(47, 'block.bookshelf')!
     static readonly MOSSY_COBBLESTONE   = Block.register(48, 'block.mossy_cobblestone')!
     static readonly OBSIDIAN            = Block.register(49, 'block.obsidian')!
+    /* eslint-enable @typescript-eslint/no-non-null-assertion */
     //#endregion
 
     private constructor(readonly id: number, readonly name: string, readonly properties: BlockProperties = BlockProperties.DEFAULT) {
