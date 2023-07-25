@@ -1,13 +1,13 @@
 import { PacketReader, PacketWriter } from ".."
 
 type DefaultPacketConstructorOptions = { raw?: Buffer }
-export type PacketConstructorOptions<T> = DefaultPacketConstructorOptions & T
+export type PacketConstructorOptions<T extends { [key: string]: unknown } = { [key: string]: unknown }> = DefaultPacketConstructorOptions & T
 
 export abstract class Packet {
     protected reader: PacketReader
     protected writer: PacketWriter
 
-    constructor({ raw }: DefaultPacketConstructorOptions = {}) {
+    constructor({ raw }: PacketConstructorOptions = {}) {
         this.reader = new PacketReader(raw)
         this.writer = new PacketWriter()
 
