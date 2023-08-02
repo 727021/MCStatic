@@ -1,11 +1,3 @@
-/**
- * Sent when a user changes a block. The mode field indicates whether a block was created (0x01) or destroyed (0x00).
- *
- * Block type is always the type player is holding, even when destroying.
- *
- * Client assumes that this command packet always succeeds, and so draws the new block immediately.
- * To disallow block creation, server must send back Set Block packet with the old block type.
- */
 import { Packet, PacketConstructorOptions } from ".."
 import { Byte, Short } from "../.."
 import { Block } from "../../../blocks"
@@ -23,6 +15,14 @@ type SetBlockConstructorOptions = PacketConstructorOptions<{
   blockType?: Block
 }>
 
+/**
+ * Sent when a user changes a block. The mode field indicates whether a block was created (0x01) or destroyed (0x00).
+ *
+ * Block type is always the type player is holding, even when destroying.
+ *
+ * Client assumes that this command packet always succeeds, and so draws the new block immediately.
+ * To disallow block creation, server must send back Set Block packet with the old block type.
+ */
 export class SetBlock extends Packet {
   #x!: number
   get x() {

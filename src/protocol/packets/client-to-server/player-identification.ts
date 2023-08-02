@@ -1,7 +1,3 @@
-/**
- * Sent by a player joining a server with relevant information.
- * The protocol version is 0x07, unless you're using a client below 0.28.
- */
 import { Packet, PacketConstructorOptions } from '..'
 import { Byte, String } from '../..'
 
@@ -12,6 +8,10 @@ type PlayerIdentificationConstructorOptions = PacketConstructorOptions<{
   verificationKey?: string
 }>
 
+/**
+ * Sent by a player joining a server with relevant information.
+ * The protocol version is 0x07, unless you're using a client below 0.28.
+ */
 export class PlayerIdentification extends Packet {
   #username!: string
   get username() {
