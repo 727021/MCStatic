@@ -1,7 +1,6 @@
 import { Packet, PacketConstructorOptions } from '..'
 import { Byte, String } from '../..'
-
-const PROTOCOL_VERSION = 0x07
+import { PROTOCOL_VERSION } from '../../../constants'
 
 type PlayerIdentificationConstructorOptions = PacketConstructorOptions<{
   username?: string,

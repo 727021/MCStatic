@@ -35,7 +35,7 @@ export class Server {
                 new Player(socket)
             })
 
-            this.tcp.on('error', (e: any) => {
+            this.tcp.on('error', (e: Error & { code?: string }) => {
                 if (e.code === 'EADDRINUSE') {
                     this.tcp.close(err => {
                         reject(err ?? e)
