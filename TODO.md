@@ -1,0 +1,7 @@
+- [ ] Finish packet classes
+- [ ] Refactor duplicate packet classes
+- [ ] Set up jest
+- [ ] Player
+- [ ] Server
+- [ ] Write readme
+- [ ] Release first playable version (1.0.0-alpha.0)

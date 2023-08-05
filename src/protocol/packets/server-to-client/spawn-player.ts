@@ -1,7 +1,9 @@
 import { Packet, PacketConstructorOptions } from '..'
-import { Byte, FShort, SByte } from '../..'
+import { Byte, FShort, SByte, String } from '../..'
 
-type PositionAndOrientationConstructorOptions = PacketConstructorOptions<{
+type SpawnPlayerConstructorOptions = PacketConstructorOptions<{
+  playerId: number
+  playerName: string
   x: number
   y: number
   z: number
@@ -10,10 +12,18 @@ type PositionAndOrientationConstructorOptions = PacketConstructorOptions<{
 }>
 
 /**
- * Sent frequently (even while not moving) by the player with the player's current location and orientation.
- * Player ID is always -1, referring to itself.
+ * Sent to indicate where a new player is spawning in the world.
+ * This will set the player's spawn point.
  */
-export class PositionAndOrientation extends Packet {
+export class SpawnPlayer extends Packet {
+  #playerId!: number
+  get playerId() {
+    return this.#playerId
+  }
+  #playerName!: string
+  get playerName() {
+    return this.#playerName
+  }
   #x!: number
   get x() {
     return this.#x
@@ -37,14 +47,24 @@ export class PositionAndOrientation extends Packet {
 
   constructor({
     raw,
+    playerId,
+    playerName,
     x,
     y,
     z,
     yaw,
     pitch
-  }: PositionAndOrientationConstructorOptions) {
+  }: SpawnPlayerConstructorOptions) {
     super({ raw })
     if (!raw) {
+      if (playerId === undefined || !SByte.isValid(playerId)) {
+        throw new Error('Invalid playerId')
+      }
+      this.#playerId = playerId
+      if (playerName === undefined || !String.isValid(playerName)) {
+        throw new Error('Invalid playerName')
+      }
+      this.#playerName = playerName
       if (x === undefined || !FShort.isValid(x)) {
         throw new Error('Invalid x')
       }
@@ -66,17 +86,27 @@ export class PositionAndOrientation extends Packet {
       }
       this.#pitch = pitch
     } else {
-      this.#x = this.reader.readFShort(Byte.SIZE + SByte.SIZE)
-      this.#y = this.reader.readFShort(Byte.SIZE + SByte.SIZE + FShort.SIZE)
+      this.#playerId = this.reader.readSByte(Byte.SIZE)
+      this.#playerName = this.reader.readString(Byte.SIZE + SByte.SIZE)
+      this.#x = this.reader.readFShort(Byte.SIZE + SByte.SIZE + String.SIZE)
+      this.#y = this.reader.readFShort(
+        Byte.SIZE + SByte.SIZE + String.SIZE + FShort.SIZE
+      )
       this.#z = this.reader.readFShort(
-        Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE
+        Byte.SIZE + SByte.SIZE + String.SIZE + FShort.SIZE + FShort.SIZE
       )
       this.#yaw = this.reader.readByte(
-        Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE + FShort.SIZE
+        Byte.SIZE +
+          SByte.SIZE +
+          String.SIZE +
+          FShort.SIZE +
+          FShort.SIZE +
+          FShort.SIZE
       )
       this.#pitch = this.reader.readByte(
         Byte.SIZE +
           SByte.SIZE +
+          String.SIZE +
           FShort.SIZE +
           FShort.SIZE +
           FShort.SIZE +
@@ -86,12 +116,13 @@ export class PositionAndOrientation extends Packet {
   }
 
   id(): number {
-    return 0x08
+    return 0x07
   }
   size(): number {
     return (
       Byte.SIZE +
       SByte.SIZE +
+      String.SIZE +
       FShort.SIZE +
       FShort.SIZE +
       FShort.SIZE +
@@ -102,7 +133,8 @@ export class PositionAndOrientation extends Packet {
   toBytes(): Buffer {
     return this.writer
       .writeByte(this.id())
-      .writeSByte(0xff) // player id
+      .writeSByte(this.playerId)
+      .writeString(this.playerName)
       .writeFShort(this.x)
       .writeFShort(this.y)
       .writeFShort(this.z)

@@ -1,7 +1,8 @@
 import { Packet, PacketConstructorOptions } from '..'
 import { Byte, FShort, SByte } from '../..'
 
-type PositionAndOrientationConstructorOptions = PacketConstructorOptions<{
+type SetPositionAndOrientationConstructorOptions = PacketConstructorOptions<{
+  playerId: number
   x: number
   y: number
   z: number
@@ -10,10 +11,16 @@ type PositionAndOrientationConstructorOptions = PacketConstructorOptions<{
 }>
 
 /**
- * Sent frequently (even while not moving) by the player with the player's current location and orientation.
- * Player ID is always -1, referring to itself.
+ * Sent with changes in player position and rotation.
+ * Used for sending initial position on the map, and teleportation.
+ *
+ * Some servers don't send relative packets, opting to only use this one.
  */
-export class PositionAndOrientation extends Packet {
+export class SetPositionAndOrientation extends Packet {
+  #playerId!: number
+  get playerId() {
+    return this.#playerId
+  }
   #x!: number
   get x() {
     return this.#x
@@ -37,14 +44,19 @@ export class PositionAndOrientation extends Packet {
 
   constructor({
     raw,
+    playerId,
     x,
     y,
     z,
     yaw,
     pitch
-  }: PositionAndOrientationConstructorOptions) {
+  }: SetPositionAndOrientationConstructorOptions) {
     super({ raw })
     if (!raw) {
+      if (playerId === undefined || !SByte.isValid(playerId)) {
+        throw new Error('Invalid playerId')
+      }
+      this.#playerId = playerId
       if (x === undefined || !FShort.isValid(x)) {
         throw new Error('Invalid x')
       }
@@ -66,6 +78,7 @@ export class PositionAndOrientation extends Packet {
       }
       this.#pitch = pitch
     } else {
+      this.#playerId = this.reader.readSByte(Byte.SIZE)
       this.#x = this.reader.readFShort(Byte.SIZE + SByte.SIZE)
       this.#y = this.reader.readFShort(Byte.SIZE + SByte.SIZE + FShort.SIZE)
       this.#z = this.reader.readFShort(
@@ -102,7 +115,7 @@ export class PositionAndOrientation extends Packet {
   toBytes(): Buffer {
     return this.writer
       .writeByte(this.id())
-      .writeSByte(0xff) // player id
+      .writeSByte(this.playerId)
       .writeFShort(this.x)
       .writeFShort(this.y)
       .writeFShort(this.z)

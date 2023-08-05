@@ -2,27 +2,37 @@ import { Packet, PacketConstructorOptions } from '..'
 import { Byte, SByte, String } from '../..'
 
 type MessageConstructorOptions = PacketConstructorOptions<{
+  playerId: number
   message: string
 }>
 
 /**
- * Contain chat messages sent by player. Player ID is always -1, referring to itself.
+ * Messages sent by chat or from the console.
  * (See [how chat works](https://wiki.vg/Chat#Old_system) - note that Classic **only** supports color codes.)
  */
 export class Message extends Packet {
+  #playerId!: number
+  get playerId() {
+    return this.#playerId
+  }
   #message!: string
   get message() {
     return this.#message
   }
 
-  constructor({ raw, message }: MessageConstructorOptions) {
+  constructor({ raw, playerId, message }: MessageConstructorOptions) {
     super({ raw })
     if (!raw) {
+      if (playerId === undefined || !SByte.isValid(playerId)) {
+        throw new Error('Invalid playerId')
+      }
+      this.#playerId = playerId
       if (message === undefined || !String.isValid(message)) {
         throw new Error('Invalid message')
       }
       this.#message = message
     } else {
+      this.#playerId = this.reader.readSByte(Byte.SIZE)
       this.#message = this.reader.readString(Byte.SIZE + SByte.SIZE)
     }
   }
@@ -36,7 +46,7 @@ export class Message extends Packet {
   toBytes(): Buffer {
     return this.writer
       .writeByte(this.id())
-      .writeSByte(0xff) // player id
+      .writeSByte(this.playerId)
       .writeString(this.message)
       .build()
   }

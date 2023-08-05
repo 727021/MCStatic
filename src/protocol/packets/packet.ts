@@ -3,7 +3,7 @@ import { PacketReader, PacketWriter } from '..'
 type DefaultPacketConstructorOptions = { raw?: Buffer }
 export type PacketConstructorOptions<
   T extends { [key: string]: unknown } = { [key: string]: unknown }
-> = DefaultPacketConstructorOptions & T
+> = DefaultPacketConstructorOptions & Partial<T>
 
 export abstract class Packet {
   protected reader: PacketReader

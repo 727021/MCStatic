@@ -2,26 +2,16 @@ import { Packet, PacketConstructorOptions } from '..'
 import { Byte, Short } from '../..'
 import { Block } from '../../../blocks'
 
-enum BlockChangeMode {
-  DESTROY = 0x00,
-  CREATE = 0x01
-}
-
 type SetBlockConstructorOptions = PacketConstructorOptions<{
   x: number
   y: number
   z: number
-  mode: BlockChangeMode
   blockType: Block
 }>
 
 /**
- * Sent when a user changes a block. The mode field indicates whether a block was created (0x01) or destroyed (0x00).
- *
- * Block type is always the type player is holding, even when destroying.
- *
- * Client assumes that this command packet always succeeds, and so draws the new block immediately.
- * To disallow block creation, server must send back Set Block packet with the old block type.
+ * Sent to indicate a block change by physics or by players.
+ * In the case of a player change, the server will also echo the block change back to the player who initiated it.
  */
 export class SetBlock extends Packet {
   #x!: number
@@ -36,16 +26,12 @@ export class SetBlock extends Packet {
   get z() {
     return this.#z
   }
-  #mode!: BlockChangeMode
-  get mode() {
-    return this.#mode
-  }
   #blockType!: Block
   get blockType() {
     return this.#blockType
   }
 
-  constructor({ raw, x, y, z, mode, blockType }: SetBlockConstructorOptions) {
+  constructor({ raw, x, y, z, blockType }: SetBlockConstructorOptions) {
     super({ raw })
     if (!raw) {
       if (x === undefined || !Short.isValid(x)) {
@@ -60,44 +46,31 @@ export class SetBlock extends Packet {
         throw new Error('Invalid z')
       }
       this.#z = z
-      if (mode === undefined || !(mode in BlockChangeMode)) {
-        throw new Error(`Invalid block change mode (${mode ?? ''})`)
-      }
-      this.#mode = mode
       const block = Block.find(blockType?.id)
       if (!block) {
-        throw new Error('Invalid block type')
+        throw new Error('Invalid blockType')
       }
       this.#blockType = block
     } else {
       this.#x = this.reader.readShort(Byte.SIZE)
       this.#y = this.reader.readShort(Byte.SIZE + Short.SIZE)
       this.#z = this.reader.readShort(Byte.SIZE + Short.SIZE + Short.SIZE)
-      const mode = this.reader.readByte(
-        Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE
-      )
-      if (!(mode in BlockChangeMode)) {
-        throw new Error(`Invalid block change mode (${mode})`)
-      }
-      this.#mode = mode
       const blockId = this.reader.readByte(
-        Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE + Byte.SIZE
+        Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE
       )
       const block = Block.find(blockId)
       if (!block) {
-        throw new Error(`Invalid block type (${blockId})`)
+        throw new Error('Invalid blockType')
       }
       this.#blockType = block
     }
   }
 
   id(): number {
-    return 0x05
+    return 0x06
   }
   size(): number {
-    return (
-      Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE + Byte.SIZE + Byte.SIZE
-    )
+    return Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE + Byte.SIZE
   }
   toBytes(): Buffer {
     return this.writer
@@ -105,8 +78,7 @@ export class SetBlock extends Packet {
       .writeShort(this.x)
       .writeShort(this.y)
       .writeShort(this.z)
-      .writeByte(this.mode)
-      .writeByte(this.blockType.id)
+      .writeByte(this.blockType.shownAs.id)
       .build()
   }
 }

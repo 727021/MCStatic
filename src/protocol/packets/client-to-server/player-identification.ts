@@ -3,8 +3,8 @@ import { Byte, String } from '../..'
 import { PROTOCOL_VERSION } from '../../../constants'
 
 type PlayerIdentificationConstructorOptions = PacketConstructorOptions<{
-  username?: string
-  verificationKey?: string
+  username: string
+  verificationKey: string
 }>
 
 /**
