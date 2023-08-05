@@ -1,6 +1,6 @@
-import { Packet, PacketConstructorOptions } from '..';
-import { Byte, String } from '../..';
-import { PROTOCOL_VERSION } from '../../../constants';
+import { Packet, PacketConstructorOptions } from '..'
+import { Byte, String } from '../..'
+import { PROTOCOL_VERSION } from '../../../constants'
 
 enum PlayerType {
   NORMAL = 0x00,
@@ -8,8 +8,8 @@ enum PlayerType {
 }
 
 type ServerIdentificationConstructorOptions = PacketConstructorOptions<{
-  serverName: string,
-  serverMotd: string,
+  serverName: string
+  serverMotd: string
   playerType: PlayerType
 }>
 
@@ -32,7 +32,12 @@ export class ServerIdentification extends Packet {
     return this.#playerType
   }
 
-  constructor({ raw, serverName, serverMotd, playerType }: ServerIdentificationConstructorOptions) {
+  constructor({
+    raw,
+    serverName,
+    serverMotd,
+    playerType
+  }: ServerIdentificationConstructorOptions) {
     super({ raw })
     if (!raw) {
       if (serverName === undefined || !String.isValid(serverName)) {
@@ -53,8 +58,12 @@ export class ServerIdentification extends Packet {
         throw new Error('Invalid protocol version')
       }
       this.#serverName = this.reader.readString(Byte.SIZE + Byte.SIZE)
-      this.#serverMotd = this.reader.readString(Byte.SIZE + Byte.SIZE + String.SIZE)
-      const playerType = this.reader.readByte(Byte.SIZE + Byte.SIZE + String.SIZE + String.SIZE)
+      this.#serverMotd = this.reader.readString(
+        Byte.SIZE + Byte.SIZE + String.SIZE
+      )
+      const playerType = this.reader.readByte(
+        Byte.SIZE + Byte.SIZE + String.SIZE + String.SIZE
+      )
       if (!(playerType in PlayerType)) {
         throw new Error('Invalid playerType')
       }

@@ -1,11 +1,11 @@
 /* eslint-disable */
-import { Level } from "./levels";
+import { Level } from './levels'
 import { Server } from './server'
 
 const server = Server.s
 
 process.on('SIGINT', () => {
-    server.stop()
+  server.stop()
 })
 
 server.start()

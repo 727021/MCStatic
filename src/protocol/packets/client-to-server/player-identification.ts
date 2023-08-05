@@ -3,7 +3,7 @@ import { Byte, String } from '../..'
 import { PROTOCOL_VERSION } from '../../../constants'
 
 type PlayerIdentificationConstructorOptions = PacketConstructorOptions<{
-  username?: string,
+  username?: string
   verificationKey?: string
 }>
 
@@ -21,7 +21,11 @@ export class PlayerIdentification extends Packet {
     return this.#verificationKey
   }
 
-  constructor({ raw, username, verificationKey }: PlayerIdentificationConstructorOptions) {
+  constructor({
+    raw,
+    username,
+    verificationKey
+  }: PlayerIdentificationConstructorOptions) {
     super({ raw })
     if (!raw) {
       if (username === undefined || !String.isValid(username)) {
@@ -38,7 +42,9 @@ export class PlayerIdentification extends Packet {
         throw new Error('Invalid protocol version')
       }
       this.#username = this.reader.readString(Byte.SIZE + Byte.SIZE)
-      this.#verificationKey = this.reader.readString(Byte.SIZE + Byte.SIZE + String.SIZE)
+      this.#verificationKey = this.reader.readString(
+        Byte.SIZE + Byte.SIZE + String.SIZE
+      )
     }
   }
 
@@ -50,11 +56,11 @@ export class PlayerIdentification extends Packet {
   }
   toBytes(): Buffer {
     return this.writer
-    .writeByte(this.id())
-    .writeByte(PROTOCOL_VERSION)
-    .writeString(this.username)
-    .writeString(this.verificationKey)
-    .writeByte(0x00) // unused
-    .build()
+      .writeByte(this.id())
+      .writeByte(PROTOCOL_VERSION)
+      .writeString(this.username)
+      .writeString(this.verificationKey)
+      .writeByte(0x00) // unused
+      .build()
   }
 }

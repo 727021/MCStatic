@@ -16,7 +16,9 @@ export class Byte {
     return value >= this.MIN && value < this.MAX
   }
 
-  private constructor() { /**/ }
+  private constructor() {
+    /**/
+  }
 }
 
 /**
@@ -33,7 +35,9 @@ export class SByte {
     return value >= this.MIN && value < this.MAX
   }
 
-  private constructor() { /**/ }
+  private constructor() {
+    /**/
+  }
 }
 
 /**
@@ -50,7 +54,9 @@ export class FByte {
     return value >= this.MIN && value < this.MAX
   }
 
-  private constructor() { /**/ }
+  private constructor() {
+    /**/
+  }
 }
 
 /**
@@ -67,7 +73,9 @@ export class Short {
     return value >= this.MIN && value < this.MAX
   }
 
-  private constructor() { /**/ }
+  private constructor() {
+    /**/
+  }
 }
 
 /**
@@ -84,7 +92,9 @@ export class FShort {
     return value >= this.MIN && value < this.MAX
   }
 
-  private constructor() { /**/ }
+  private constructor() {
+    /**/
+  }
 }
 
 /**
@@ -96,10 +106,15 @@ export class String {
     return ''.padEnd(this.SIZE)
   }
   static isValid(value: string, allowEmpty = false) {
-    return (!!value.trimEnd().length || allowEmpty) && value.trimEnd().length <= this.SIZE
+    return (
+      (!!value.trimEnd().length || allowEmpty) &&
+      value.trimEnd().length <= this.SIZE
+    )
   }
 
-  private constructor() { /**/ }
+  private constructor() {
+    /**/
+  }
 }
 
 /**
@@ -112,8 +127,12 @@ export class ByteArray {
   }
   static isValid(value: number[], allowEmpty = false) {
     const endIndex = value.findLastIndex(x => x !== 0x00)
-    return (allowEmpty || (value.length > 0 && endIndex > 0)) && endIndex < this.SIZE
+    return (
+      (allowEmpty || (value.length > 0 && endIndex > 0)) && endIndex < this.SIZE
+    )
   }
 
-  private constructor() { /**/ }
+  private constructor() {
+    /**/
+  }
 }

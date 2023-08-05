@@ -1,5 +1,5 @@
-import { Packet, PacketConstructorOptions } from "..";
-import { Byte, SByte, String } from "../..";
+import { Packet, PacketConstructorOptions } from '..'
+import { Byte, SByte, String } from '../..'
 
 type MessageConstructorOptions = PacketConstructorOptions<{
   message?: string

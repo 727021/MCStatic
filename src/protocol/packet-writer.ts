@@ -1,5 +1,4 @@
-export class PacketWriter
-{
+export class PacketWriter {
   private buf: Buffer
 
   constructor() {

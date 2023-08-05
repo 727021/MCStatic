@@ -1,6 +1,6 @@
-import { Packet, PacketConstructorOptions } from ".."
-import { Byte, Short } from "../.."
-import { Block } from "../../../blocks"
+import { Packet, PacketConstructorOptions } from '..'
+import { Byte, Short } from '../..'
+import { Block } from '../../../blocks'
 
 enum BlockChangeMode {
   DESTROY = 0x00,
@@ -8,10 +8,10 @@ enum BlockChangeMode {
 }
 
 type SetBlockConstructorOptions = PacketConstructorOptions<{
-  x?: number,
-  y?: number,
-  z?: number,
-  mode?: BlockChangeMode,
+  x?: number
+  y?: number
+  z?: number
+  mode?: BlockChangeMode
   blockType?: Block
 }>
 
@@ -72,12 +72,16 @@ export class SetBlock extends Packet {
       this.#x = this.reader.readShort(Byte.SIZE)
       this.#y = this.reader.readShort(Byte.SIZE + Short.SIZE)
       this.#z = this.reader.readShort(Byte.SIZE + Short.SIZE + Short.SIZE)
-      const mode = this.reader.readByte(Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE)
+      const mode = this.reader.readByte(
+        Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE
+      )
       if (!(mode in BlockChangeMode)) {
         throw new Error(`Invalid block change mode (${mode})`)
       }
       this.#mode = mode
-      const blockId = this.reader.readByte(Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE + Byte.SIZE)
+      const blockId = this.reader.readByte(
+        Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE + Byte.SIZE
+      )
       const block = Block.find(blockId)
       if (!block) {
         throw new Error(`Invalid block type (${blockId})`)
@@ -87,10 +91,12 @@ export class SetBlock extends Packet {
   }
 
   id(): number {
-      return 0x05
+    return 0x05
   }
   size(): number {
-      return Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE + Byte.SIZE + Byte.SIZE
+    return (
+      Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE + Byte.SIZE + Byte.SIZE
+    )
   }
   toBytes(): Buffer {
     return this.writer

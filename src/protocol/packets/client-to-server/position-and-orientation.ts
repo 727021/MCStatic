@@ -1,11 +1,11 @@
-import { Packet, PacketConstructorOptions } from ".."
-import { Byte, FShort, SByte } from "../.."
+import { Packet, PacketConstructorOptions } from '..'
+import { Byte, FShort, SByte } from '../..'
 
 type PositionAndOrientationConstructorOptions = PacketConstructorOptions<{
-  x?: number,
-  y?: number,
-  z?: number,
-  yaw?: number,
+  x?: number
+  y?: number
+  z?: number
+  yaw?: number
   pitch?: number
 }>
 
@@ -35,7 +35,14 @@ export class PositionAndOrientation extends Packet {
     return this.#pitch
   }
 
-  constructor({ raw, x, y, z, yaw, pitch }: PositionAndOrientationConstructorOptions) {
+  constructor({
+    raw,
+    x,
+    y,
+    z,
+    yaw,
+    pitch
+  }: PositionAndOrientationConstructorOptions) {
     super({ raw })
     if (!raw) {
       if (x === undefined || !FShort.isValid(x)) {
@@ -61,9 +68,20 @@ export class PositionAndOrientation extends Packet {
     } else {
       this.#x = this.reader.readFShort(Byte.SIZE + SByte.SIZE)
       this.#y = this.reader.readFShort(Byte.SIZE + SByte.SIZE + FShort.SIZE)
-      this.#z = this.reader.readFShort(Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE)
-      this.#yaw = this.reader.readByte(Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE + FShort.SIZE)
-      this.#pitch = this.reader.readByte(Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE + FShort.SIZE + Byte.SIZE)
+      this.#z = this.reader.readFShort(
+        Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE
+      )
+      this.#yaw = this.reader.readByte(
+        Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE + FShort.SIZE
+      )
+      this.#pitch = this.reader.readByte(
+        Byte.SIZE +
+          SByte.SIZE +
+          FShort.SIZE +
+          FShort.SIZE +
+          FShort.SIZE +
+          Byte.SIZE
+      )
     }
   }
 
@@ -71,7 +89,15 @@ export class PositionAndOrientation extends Packet {
     return 0x08
   }
   size(): number {
-    return Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE + FShort.SIZE + Byte.SIZE + Byte.SIZE
+    return (
+      Byte.SIZE +
+      SByte.SIZE +
+      FShort.SIZE +
+      FShort.SIZE +
+      FShort.SIZE +
+      Byte.SIZE +
+      Byte.SIZE
+    )
   }
   toBytes(): Buffer {
     return this.writer
@@ -84,5 +110,4 @@ export class PositionAndOrientation extends Packet {
       .writeByte(this.pitch)
       .build()
   }
-
 }
