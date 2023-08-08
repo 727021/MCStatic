@@ -1,4 +1,9 @@
-import { Packet } from '..'
+import { Packet, PacketConstructorOptions } from '..'
+import { Byte, String } from '../..'
+
+type DisconnectPlayerConstructorOptions = PacketConstructorOptions<{
+  disconnectReason: string
+}>
 
 /**
  * Sent to a player when they're disconnected from the server.
@@ -8,13 +13,33 @@ import { Packet } from '..'
  * 4. "Cheat detected: Too much lag"
  */
 export class DisconnectPlayer extends Packet {
+  #disconnectReason!: string
+  get disconnectReason() {
+    return this.#disconnectReason
+  }
+
+  constructor({ raw, disconnectReason }: DisconnectPlayerConstructorOptions) {
+    super({ raw })
+    if (!raw) {
+      if (disconnectReason === undefined || !String.isValid(disconnectReason)) {
+        throw new Error('Invalid disconnectReason')
+      }
+      this.#disconnectReason = disconnectReason
+    } else {
+      this.#disconnectReason = this.reader.readString(Byte.SIZE)
+    }
+  }
+
   id(): number {
-    throw new Error('Method not implemented.')
+    return 0x0e
   }
   size(): number {
-    throw new Error('Method not implemented.')
+    return Byte.SIZE + String.SIZE
   }
   toBytes(): Buffer {
-    throw new Error('Method not implemented.')
+    return this.writer
+      .writeByte(this.id())
+      .writeString(this.disconnectReason)
+      .build()
   }
 }
