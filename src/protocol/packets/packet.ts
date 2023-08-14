@@ -9,14 +9,14 @@ export type PacketConstructorOptions<
 export abstract class Packet {
   protected reader: PacketReader
   protected writer: PacketWriter
-  readonly direction: PacketDirection
+  readonly #direction: PacketDirection
 
   constructor({ raw }: PacketConstructorOptions = {}) {
     this.reader = new PacketReader(raw)
     this.writer = new PacketWriter()
 
     if (raw) {
-      this.direction = PacketDirection.CLIENT_TO_SERVER
+      this.#direction = PacketDirection.CLIENT_TO_SERVER
       const id = this.reader.readByte(0)
       if (raw.length !== this.size()) {
         throw new Error(`Incorrect packet length (${raw.length})`)
@@ -25,8 +25,12 @@ export abstract class Packet {
         throw new Error(`Incorrect packet id (${id})`)
       }
     } else {
-      this.direction = PacketDirection.SERVER_TO_CLIENT
+      this.#direction = PacketDirection.SERVER_TO_CLIENT
     }
+  }
+
+  direction() {
+    return this.#direction
   }
 
   /**
@@ -38,4 +42,24 @@ export abstract class Packet {
    */
   abstract size(): number
   abstract toBytes(): Buffer
+}
+
+export abstract class ServerPacket extends Packet {
+  constructor(options: Omit<PacketConstructorOptions, 'raw'> = {}) {
+    super()
+  }
+
+  direction(): PacketDirection {
+    return PacketDirection.SERVER_TO_CLIENT
+  }
+}
+
+export abstract class ClientPacket extends Packet {
+  constructor({ raw }: DefaultPacketConstructorOptions) {
+    super({ raw })
+  }
+
+  direction(): PacketDirection {
+    return PacketDirection.CLIENT_TO_SERVER
+  }
 }
