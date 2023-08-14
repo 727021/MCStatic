@@ -1,11 +1,6 @@
 import { Packet, PacketConstructorOptions } from '..'
 import { Byte, String } from '../..'
-import { PROTOCOL_VERSION } from '../../../constants'
-
-enum PlayerType {
-  NORMAL = 0x00,
-  OP = 0x64
-}
+import { PROTOCOL_VERSION, PlayerType } from '../../../constants'
 
 type ServerIdentificationConstructorOptions = PacketConstructorOptions<{
   serverName: string

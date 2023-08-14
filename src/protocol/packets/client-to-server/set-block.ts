@@ -1,11 +1,7 @@
 import { Packet, PacketConstructorOptions } from '..'
 import { Byte, Short } from '../..'
 import { Block } from '../../../blocks'
-
-enum BlockChangeMode {
-  DESTROY = 0x00,
-  CREATE = 0x01
-}
+import { BlockChangeMode } from '../../../constants'
 
 type SetBlockConstructorOptions = PacketConstructorOptions<{
   x: number

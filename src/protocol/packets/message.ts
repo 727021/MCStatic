@@ -1,5 +1,6 @@
-import { Packet, PacketConstructorOptions } from '..'
-import { Byte, SByte, String } from '../..'
+import { Packet, PacketConstructorOptions } from '.'
+import { Byte, SByte, String } from '..'
+import { PacketDirection } from '../../constants'
 
 type MessageConstructorOptions = PacketConstructorOptions<{
   message: string
@@ -10,6 +11,10 @@ type MessageConstructorOptions = PacketConstructorOptions<{
  * (See [how chat works](https://wiki.vg/Chat#Old_system) - note that Classic **only** supports color codes.)
  */
 export class Message extends Packet {
+  #playerId!: number
+  get playerId() {
+    return this.#playerId
+  }
   #message!: string
   get message() {
     return this.#message
@@ -17,12 +22,14 @@ export class Message extends Packet {
 
   constructor({ raw, message }: MessageConstructorOptions) {
     super({ raw })
-    if (!raw) {
+    if (this.direction === PacketDirection.SERVER_TO_CLIENT) {
       if (message === undefined || !String.isValid(message)) {
         throw new Error('Invalid message')
       }
       this.#message = message
+      this.#playerId = 0xff
     } else {
+      this.#playerId = this.reader.readSByte(Byte.SIZE)
       this.#message = this.reader.readString(Byte.SIZE + SByte.SIZE)
     }
   }
@@ -36,7 +43,7 @@ export class Message extends Packet {
   toBytes(): Buffer {
     return this.writer
       .writeByte(this.id())
-      .writeSByte(0xff) // player id
+      .writeSByte(this.playerId)
       .writeString(this.message)
       .build()
   }

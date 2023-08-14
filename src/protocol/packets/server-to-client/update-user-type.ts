@@ -1,10 +1,6 @@
 import { Packet, PacketConstructorOptions } from ".."
 import { Byte } from "../.."
-
-enum PlayerType {
-  NORMAL = 0x00,
-  OP = 0x64
-}
+import { PlayerType } from "../../../constants"
 
 type UpdateUserTypeConstructorOptions = PacketConstructorOptions<{
   playerType: PlayerType

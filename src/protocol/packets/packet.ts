@@ -1,4 +1,5 @@
 import { PacketReader, PacketWriter } from '..'
+import { PacketDirection } from '../../constants'
 
 type DefaultPacketConstructorOptions = { raw?: Buffer }
 export type PacketConstructorOptions<
@@ -8,12 +9,14 @@ export type PacketConstructorOptions<
 export abstract class Packet {
   protected reader: PacketReader
   protected writer: PacketWriter
+  readonly direction: PacketDirection
 
   constructor({ raw }: PacketConstructorOptions = {}) {
     this.reader = new PacketReader(raw)
     this.writer = new PacketWriter()
 
     if (raw) {
+      this.direction = PacketDirection.CLIENT_TO_SERVER
       const id = this.reader.readByte(0)
       if (raw.length !== this.size()) {
         throw new Error(`Incorrect packet length (${raw.length})`)
@@ -21,6 +24,8 @@ export abstract class Packet {
       if (id !== this.id()) {
         throw new Error(`Incorrect packet id (${id})`)
       }
+    } else {
+      this.direction = PacketDirection.SERVER_TO_CLIENT
     }
   }
 
