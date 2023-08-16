@@ -9,14 +9,17 @@ export type PacketConstructorOptions<
 export abstract class Packet {
   protected reader: PacketReader
   protected writer: PacketWriter
-  readonly #direction: PacketDirection
+  protected _direction: PacketDirection
+  get direction() {
+    return this._direction
+  }
 
   constructor({ raw }: PacketConstructorOptions = {}) {
     this.reader = new PacketReader(raw)
     this.writer = new PacketWriter()
 
     if (raw) {
-      this.#direction = PacketDirection.CLIENT_TO_SERVER
+      this._direction = PacketDirection.CLIENT_TO_SERVER
       const id = this.reader.readByte(0)
       if (raw.length !== this.size()) {
         throw new Error(`Incorrect packet length (${raw.length})`)
@@ -25,12 +28,8 @@ export abstract class Packet {
         throw new Error(`Incorrect packet id (${id})`)
       }
     } else {
-      this.#direction = PacketDirection.SERVER_TO_CLIENT
+      this._direction = PacketDirection.SERVER_TO_CLIENT
     }
-  }
-
-  direction() {
-    return this.#direction
   }
 
   /**
@@ -44,22 +43,16 @@ export abstract class Packet {
   abstract toBytes(): Buffer
 }
 
+export type ServerPacketConstructorOptions<T extends { [key: string]: unknown } = { [key: string]: unknown }> = T
 export abstract class ServerPacket extends Packet {
-  constructor(options: Omit<PacketConstructorOptions, 'raw'> = {}) {
+  constructor(options: ServerPacketConstructorOptions = {}) {
     super()
-  }
-
-  direction(): PacketDirection {
-    return PacketDirection.SERVER_TO_CLIENT
   }
 }
 
+export type ClientPacketConstructorOptions = Required<DefaultPacketConstructorOptions>
 export abstract class ClientPacket extends Packet {
-  constructor({ raw }: DefaultPacketConstructorOptions) {
+  constructor({ raw }: ClientPacketConstructorOptions) {
     super({ raw })
-  }
-
-  direction(): PacketDirection {
-    return PacketDirection.CLIENT_TO_SERVER
   }
 }

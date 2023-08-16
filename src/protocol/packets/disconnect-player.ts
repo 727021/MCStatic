@@ -1,7 +1,7 @@
-import { Packet, PacketConstructorOptions } from '..'
-import { Byte, String } from '../..'
+import { ServerPacket, ServerPacketConstructorOptions } from '.'
+import { Byte, String } from '..'
 
-type DisconnectPlayerConstructorOptions = PacketConstructorOptions<{
+type DisconnectPlayerConstructorOptions = ServerPacketConstructorOptions<{
   disconnectReason: string
 }>
 
@@ -12,22 +12,18 @@ type DisconnectPlayerConstructorOptions = PacketConstructorOptions<{
  * 3. "Cheat detected: Too much clicking!"
  * 4. "Cheat detected: Too much lag"
  */
-export class DisconnectPlayer extends Packet {
+export class DisconnectPlayer extends ServerPacket {
   #disconnectReason!: string
   get disconnectReason() {
     return this.#disconnectReason
   }
 
-  constructor({ raw, disconnectReason }: DisconnectPlayerConstructorOptions) {
-    super({ raw })
-    if (!raw) {
-      if (disconnectReason === undefined || !String.isValid(disconnectReason)) {
-        throw new Error('Invalid disconnectReason')
-      }
-      this.#disconnectReason = disconnectReason
-    } else {
-      this.#disconnectReason = this.reader.readString(Byte.SIZE)
+  constructor({ disconnectReason }: DisconnectPlayerConstructorOptions) {
+    super()
+    if (disconnectReason === undefined || !String.isValid(disconnectReason)) {
+      throw new Error('Invalid disconnectReason')
     }
+    this.#disconnectReason = disconnectReason
   }
 
   id(): number {

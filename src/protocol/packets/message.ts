@@ -22,7 +22,7 @@ export class Message extends Packet {
 
   constructor({ raw, message }: MessageConstructorOptions) {
     super({ raw })
-    if (this.direction() === PacketDirection.SERVER_TO_CLIENT) {
+    if (this.direction === PacketDirection.SERVER_TO_CLIENT) {
       if (message === undefined || !String.isValid(message)) {
         throw new Error('Invalid message')
       }

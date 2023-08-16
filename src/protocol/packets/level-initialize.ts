@@ -1,12 +1,12 @@
-import { Packet, PacketConstructorOptions } from '..'
-import { Byte } from '../..'
+import { ServerPacket } from '.'
+import { Byte } from '..'
 
 /**
  * Notifies the player of incoming level data.
  */
-export class LevelInitialize extends Packet {
-  constructor(options: PacketConstructorOptions) {
-    super(options)
+export class LevelInitialize extends ServerPacket {
+  constructor() {
+    super()
   }
 
   id(): number {
