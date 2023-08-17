@@ -2,14 +2,15 @@ import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, FByte, SByte } from '..'
 import { PacketType } from '../../constants'
 
-type PositionAndOrientationUpdateConstructorOptions = ServerPacketConstructorOptions<{
-  playerId: number
-  dX: number
-  dY: number
-  dZ: number
-  yaw: number
-  pitch: number
-}>
+type PositionAndOrientationUpdateConstructorOptions =
+  ServerPacketConstructorOptions<{
+    playerId: number
+    dX: number
+    dY: number
+    dZ: number
+    yaw: number
+    pitch: number
+  }>
 
 /**
  * Sent with changes in player position and rotation.

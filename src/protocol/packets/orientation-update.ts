@@ -27,11 +27,7 @@ export class OrientationUpdate extends ServerPacket {
     return this.#pitch
   }
 
-  constructor({
-    playerId,
-    yaw,
-    pitch
-  }: OrientationUpdateConstructorOptions) {
+  constructor({ playerId, yaw, pitch }: OrientationUpdateConstructorOptions) {
     super()
     if (playerId === undefined || !SByte.isValid(playerId)) {
       throw new Error('Invalid playerId')

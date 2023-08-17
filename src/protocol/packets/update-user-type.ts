@@ -1,6 +1,6 @@
-import { ServerPacket, ServerPacketConstructorOptions } from "."
-import { Byte } from ".."
-import { PacketType, PlayerType } from "../../constants"
+import { ServerPacket, ServerPacketConstructorOptions } from '.'
+import { Byte } from '..'
+import { PacketType, PlayerType } from '../../constants'
 
 type UpdateUserTypeConstructorOptions = ServerPacketConstructorOptions<{
   playerType: PlayerType
@@ -32,9 +32,6 @@ export class UpdateUserType extends ServerPacket {
     return Byte.SIZE + Byte.SIZE
   }
   toBytes() {
-    return this.writer
-      .writeByte(this.id())
-      .writeByte(this.playerType)
-      .build()
+    return this.writer.writeByte(this.id()).writeByte(this.playerType).build()
   }
 }

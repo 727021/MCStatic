@@ -43,14 +43,17 @@ export abstract class Packet {
   abstract toBytes(): Buffer
 }
 
-export type ServerPacketConstructorOptions<T extends { [key: string]: unknown } = { [key: string]: unknown }> = T
+export type ServerPacketConstructorOptions<
+  T extends { [key: string]: unknown } = { [key: string]: unknown }
+> = T
 export abstract class ServerPacket extends Packet {
   constructor(options: ServerPacketConstructorOptions = {}) {
     super()
   }
 }
 
-export type ClientPacketConstructorOptions = Required<DefaultPacketConstructorOptions>
+export type ClientPacketConstructorOptions =
+  Required<DefaultPacketConstructorOptions>
 export abstract class ClientPacket extends Packet {
   constructor({ raw }: ClientPacketConstructorOptions) {
     super({ raw })

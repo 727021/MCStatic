@@ -1,4 +1,4 @@
-import { ClientPacketConstructorOptions, ClientPacket } from '.'
+import { ClientPacket, ClientPacketConstructorOptions } from '.'
 import { Byte, String } from '..'
 import { PROTOCOL_VERSION, PacketType } from '../../constants'
 
@@ -16,9 +16,7 @@ export class PlayerIdentification extends ClientPacket {
     return this.#verificationKey
   }
 
-  constructor({
-    raw
-  }: ClientPacketConstructorOptions) {
+  constructor({ raw }: ClientPacketConstructorOptions) {
     super({ raw })
     const protocolVersion = this.reader.readByte(Byte.SIZE)
     if (protocolVersion !== PROTOCOL_VERSION) {

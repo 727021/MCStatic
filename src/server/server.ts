@@ -40,19 +40,21 @@ export class Server {
 
   async start() {
     // TODO: Do other setup (load/create config, load main level, connect to db, etc.)
-    this.level = await (Level.exists('main') ? Level.load('main') : Level.create({
-      name: 'main',
-      width: 16,
-      height: 16,
-      depth: 16,
-      spawn: {
-        x: 4,
-        y: 2,
-        z: 4,
-        rotx: 0,
-        roty: 0
-      }
-    })) as Level
+    this.level = (await (Level.exists('main')
+      ? Level.load('main')
+      : Level.create({
+          name: 'main',
+          width: 16,
+          height: 16,
+          depth: 16,
+          spawn: {
+            x: 4,
+            y: 2,
+            z: 4,
+            rotx: 0,
+            roty: 0
+          }
+        }))) as Level
     return new Promise<void>((resolve, reject) => {
       this.tcp.on('connection', socket => {
         try {
@@ -79,7 +81,9 @@ export class Server {
   async stop() {
     // TODO: other cleanup
     // Kick all players
-    await Promise.allSettled([...Player.connected].map(player => player.kick('Server closed')))
+    await Promise.allSettled(
+      [...Player.connected].map(player => player.kick('Server closed'))
+    )
     // Unload all levels
     await Promise.allSettled([...Level.loaded].map(level => level.unload()))
     // Unload all plugins

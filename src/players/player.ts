@@ -1,9 +1,25 @@
 import { Socket } from 'node:net'
-import { DespawnPlayer, DisconnectPlayer, LevelDataChunk, LevelFinalize, LevelInitialize, Message, PacketReader, Ping, PlayerIdentification, ServerIdentification, SetBlockServer, SetPositionAndOrientation, SpawnPlayer, UpdateUserType } from '../protocol'
-import { Server } from '../server'
+
+import { Block } from '../blocks'
 import { PacketType, PlayerType } from '../constants'
 import { Level } from '../levels'
-import { Block } from '../blocks'
+import {
+  DespawnPlayer,
+  DisconnectPlayer,
+  LevelDataChunk,
+  LevelFinalize,
+  LevelInitialize,
+  Message,
+  PacketReader,
+  Ping,
+  PlayerIdentification,
+  ServerIdentification,
+  SetBlockServer,
+  SetPositionAndOrientation,
+  SpawnPlayer,
+  UpdateUserType
+} from '../protocol'
+import { Server } from '../server'
 import * as log from '../utils/debug'
 
 // Server -> Client
@@ -113,7 +129,11 @@ export class Player {
   }
 
   sendLevelFinalize(level: Level) {
-    const packet = new LevelFinalize({ xSize: level.width, ySize: level.height, zSize: level.depth })
+    const packet = new LevelFinalize({
+      xSize: level.width,
+      ySize: level.height,
+      zSize: level.depth
+    })
     this.socket.write(packet.toBytes())
   }
 
@@ -180,7 +200,9 @@ export class Player {
   handlePlayerIdentification(packet: PlayerIdentification) {
     this.name = packet.username
     this.key = packet.verificationKey
-    const isLegit = this.socket.remoteAddress === this.socket.localAddress || Server.s.authenticatePlayer(this)
+    const isLegit =
+      this.socket.remoteAddress === this.socket.localAddress ||
+      Server.s.authenticatePlayer(this)
     if (!isLegit) {
       this.kick('authentication failed').catch(err => console.error(err))
       return
