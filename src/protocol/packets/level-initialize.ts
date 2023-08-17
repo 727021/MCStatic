@@ -1,5 +1,6 @@
 import { ServerPacket } from '.'
 import { Byte } from '..'
+import { PacketType } from '../../constants'
 
 /**
  * Notifies the player of incoming level data.
@@ -9,13 +10,13 @@ export class LevelInitialize extends ServerPacket {
     super()
   }
 
-  id(): number {
-    return 0x02
+  id() {
+    return PacketType.LEVEL_INITIALIZE
   }
-  size(): number {
+  size() {
     return Byte.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer.writeByte(this.id()).build()
   }
 }

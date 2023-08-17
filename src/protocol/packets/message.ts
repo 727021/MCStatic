@@ -1,6 +1,6 @@
 import { Packet, PacketConstructorOptions } from '.'
 import { Byte, SByte, String } from '..'
-import { PacketDirection } from '../../constants'
+import { PacketDirection, PacketType } from '../../constants'
 
 type MessageConstructorOptions = PacketConstructorOptions<{
   message: string
@@ -34,13 +34,13 @@ export class Message extends Packet {
     }
   }
 
-  id(): number {
-    return 0x0d
+  id() {
+    return PacketType.MESSAGE
   }
-  size(): number {
+  size() {
     return Byte.SIZE + SByte.SIZE + String.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeSByte(this.playerId)

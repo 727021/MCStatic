@@ -1,6 +1,6 @@
 import { Packet, PacketConstructorOptions } from '.'
 import { Byte, FShort, SByte } from '..'
-import { PacketDirection } from '../../constants'
+import { PacketDirection, PacketType } from '../../constants'
 
 type SetPositionAndOrientationConstructorOptions = PacketConstructorOptions<{
   playerId: number
@@ -99,10 +99,10 @@ export class SetPositionAndOrientation extends Packet {
     }
   }
 
-  id(): number {
-    return 0x08
+  id() {
+    return PacketType.SET_POSITION_AND_ORIENTATION
   }
-  size(): number {
+  size() {
     return (
       Byte.SIZE +
       SByte.SIZE +
@@ -113,7 +113,7 @@ export class SetPositionAndOrientation extends Packet {
       Byte.SIZE
     )
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeSByte(this.playerId)

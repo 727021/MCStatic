@@ -1,6 +1,6 @@
 import { ClientPacketConstructorOptions, ClientPacket } from '.'
 import { Byte, String } from '..'
-import { PROTOCOL_VERSION } from '../../constants'
+import { PROTOCOL_VERSION, PacketType } from '../../constants'
 
 /**
  * Sent by a player joining a server with relevant information.
@@ -31,12 +31,12 @@ export class PlayerIdentification extends ClientPacket {
   }
 
   id() {
-    return 0x00
+    return PacketType.IDENTIFICATION
   }
   size() {
     return Byte.SIZE + Byte.SIZE + String.SIZE + String.SIZE + Byte.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeByte(PROTOCOL_VERSION)

@@ -1,5 +1,6 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, FByte, SByte } from '..'
+import { PacketType } from '../../constants'
 
 type PositionAndOrientationUpdateConstructorOptions = ServerPacketConstructorOptions<{
   playerId: number
@@ -77,10 +78,10 @@ export class PositionAndOrientationUpdate extends ServerPacket {
     this.#pitch = pitch
   }
 
-  id(): number {
-    return 0x09
+  id() {
+    return PacketType.POSITION_AND_ORIENTATION_UPDATE
   }
-  size(): number {
+  size() {
     return (
       Byte.SIZE +
       SByte.SIZE +
@@ -91,7 +92,7 @@ export class PositionAndOrientationUpdate extends ServerPacket {
       Byte.SIZE
     )
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeSByte(this.playerId)

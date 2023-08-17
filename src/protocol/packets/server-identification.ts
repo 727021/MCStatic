@@ -1,6 +1,6 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, String } from '..'
-import { PROTOCOL_VERSION, PlayerType } from '../../constants'
+import { PROTOCOL_VERSION, PacketType, PlayerType } from '../../constants'
 
 type ServerIdentificationConstructorOptions = ServerPacketConstructorOptions<{
   serverName: string
@@ -47,13 +47,13 @@ export class ServerIdentification extends ServerPacket {
     this.#playerType = playerType
   }
 
-  id(): number {
-    return 0x00
+  id() {
+    return PacketType.IDENTIFICATION
   }
-  size(): number {
+  size() {
     return Byte.SIZE + Byte.SIZE + String.SIZE + String.SIZE + Byte.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeByte(PROTOCOL_VERSION)

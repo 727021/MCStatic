@@ -1,5 +1,6 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, String } from '..'
+import { PacketType } from '../../constants'
 
 type DisconnectPlayerConstructorOptions = ServerPacketConstructorOptions<{
   disconnectReason: string
@@ -26,13 +27,13 @@ export class DisconnectPlayer extends ServerPacket {
     this.#disconnectReason = disconnectReason
   }
 
-  id(): number {
-    return 0x0e
+  id() {
+    return PacketType.DISCONNECT_PLAYER
   }
-  size(): number {
+  size() {
     return Byte.SIZE + String.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeString(this.disconnectReason)

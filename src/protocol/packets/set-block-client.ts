@@ -1,7 +1,7 @@
 import { ClientPacket, ClientPacketConstructorOptions } from '.'
 import { Byte, Short } from '..'
 import { Block } from '../../blocks'
-import { BlockChangeMode } from '../../constants'
+import { BlockChangeMode, PacketType } from '../../constants'
 
 /**
  * Sent when a user changes a block. The mode field indicates whether a block was created (0x01) or destroyed (0x00).
@@ -55,15 +55,15 @@ export class SetBlockClient extends ClientPacket {
     this.#blockType = block
   }
 
-  id(): number {
-    return 0x05
+  id() {
+    return PacketType.SET_BLOCK_CLIENT
   }
-  size(): number {
+  size() {
     return (
       Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE + Byte.SIZE + Byte.SIZE
     )
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeShort(this.x)

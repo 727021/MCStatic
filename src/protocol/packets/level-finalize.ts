@@ -1,5 +1,6 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, Short } from '..'
+import { PacketType } from '../../constants'
 
 type LevelFinalizeConstructorOptions = ServerPacketConstructorOptions<{
   xSize: number
@@ -41,13 +42,13 @@ export class LevelFinalize extends ServerPacket {
     this.#zSize = zSize
   }
 
-  id(): number {
-    return 0x04
+  id() {
+    return PacketType.LEVEL_FINALIZE
   }
-  size(): number {
+  size() {
     return Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeShort(this.xSize)

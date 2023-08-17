@@ -1,5 +1,6 @@
 import { ServerPacket } from '.'
 import { Byte } from '..'
+import { PacketType } from '../../constants'
 
 /**
  * Sent to clients periodically.
@@ -11,13 +12,13 @@ export class Ping extends ServerPacket {
     super()
   }
 
-  id(): number {
-    return 0x01
+  id() {
+    return PacketType.PING
   }
-  size(): number {
+  size() {
     return Byte.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer.writeByte(this.id()).build()
   }
 }

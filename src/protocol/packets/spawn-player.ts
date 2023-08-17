@@ -1,5 +1,6 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, FShort, SByte, String } from '..'
+import { PacketType } from '../../constants'
 
 type SpawnPlayerConstructorOptions = ServerPacketConstructorOptions<{
   playerId: number
@@ -85,10 +86,10 @@ export class SpawnPlayer extends ServerPacket {
     this.#pitch = pitch
   }
 
-  id(): number {
-    return 0x07
+  id() {
+    return PacketType.SPAWN_PLAYER
   }
-  size(): number {
+  size() {
     return (
       Byte.SIZE +
       SByte.SIZE +
@@ -100,7 +101,7 @@ export class SpawnPlayer extends ServerPacket {
       Byte.SIZE
     )
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeSByte(this.playerId)

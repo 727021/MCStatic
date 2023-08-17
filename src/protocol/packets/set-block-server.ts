@@ -1,6 +1,7 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, Short } from '..'
 import { Block } from '../../blocks'
+import { PacketType } from '../../constants'
 
 type SetBlockConstructorOptions = ServerPacketConstructorOptions<{
   x: number
@@ -52,13 +53,13 @@ export class SetBlockServer extends ServerPacket {
     this.#blockType = block
   }
 
-  id(): number {
-    return 0x06
+  id() {
+    return PacketType.SET_BLOCK_SERVER
   }
-  size(): number {
+  size() {
     return Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE + Byte.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeShort(this.x)

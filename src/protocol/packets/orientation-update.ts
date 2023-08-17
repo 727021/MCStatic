@@ -1,5 +1,6 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, SByte } from '..'
+import { PacketType } from '../../constants'
 
 type OrientationUpdateConstructorOptions = ServerPacketConstructorOptions<{
   playerId: number
@@ -46,13 +47,13 @@ export class OrientationUpdate extends ServerPacket {
     this.#pitch = pitch
   }
 
-  id(): number {
-    return 0x0b
+  id() {
+    return PacketType.ORIENTATION_UPDATE
   }
-  size(): number {
+  size() {
     return Byte.SIZE + SByte.SIZE + Byte.SIZE + Byte.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeSByte(this.playerId)

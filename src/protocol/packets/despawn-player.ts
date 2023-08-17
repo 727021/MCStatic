@@ -1,5 +1,6 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, SByte } from '..'
+import { PacketType } from '../../constants'
 
 type DespawnPlayerConstructorOptions = ServerPacketConstructorOptions<{
   playerId: number
@@ -22,13 +23,13 @@ export class DespawnPlayer extends ServerPacket {
     this.#playerId = playerId
   }
 
-  id(): number {
-    return 0x0c
+  id() {
+    return PacketType.DESPAWN_PLAYER
   }
-  size(): number {
+  size() {
     return Byte.SIZE + SByte.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer.writeByte(this.id()).writeSByte(this.playerId).build()
   }
 }

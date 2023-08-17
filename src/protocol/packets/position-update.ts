@@ -1,5 +1,6 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, FByte, SByte } from '..'
+import { PacketType } from '../../constants'
 
 type PositionUpdateConstructorOptions = ServerPacketConstructorOptions<{
   playerId: number
@@ -51,13 +52,13 @@ export class PositionUpdate extends ServerPacket {
     this.#dZ = dZ
   }
 
-  id(): number {
-    return 0x0a
+  id() {
+    return PacketType.POSITION_UPDATE
   }
-  size(): number {
+  size() {
     return Byte.SIZE + SByte.SIZE + FByte.SIZE + FByte.SIZE + FByte.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeSByte(this.playerId)

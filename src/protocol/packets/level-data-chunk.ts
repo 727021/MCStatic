@@ -1,5 +1,6 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, ByteArray, Short } from '..'
+import { PacketType } from '../../constants'
 
 type LevelDataChunkConstructorOptions = ServerPacketConstructorOptions<{
   chunkLength: number
@@ -49,13 +50,13 @@ export class LevelDataChunk extends ServerPacket {
     this.#percentComplete = percentComplete
   }
 
-  id(): number {
-    return 0x03
+  id() {
+    return PacketType.LEVEL_DATA_CHUNK
   }
-  size(): number {
+  size() {
     return Byte.SIZE + Short.SIZE + ByteArray.SIZE + Byte.SIZE
   }
-  toBytes(): Buffer {
+  toBytes() {
     return this.writer
       .writeByte(this.id())
       .writeShort(this.chunkLength)

@@ -1,5 +1,5 @@
 import { PacketReader, PacketWriter } from '..'
-import { PacketDirection } from '../../constants'
+import { PacketDirection, PacketType } from '../../constants'
 
 type DefaultPacketConstructorOptions = { raw?: Buffer }
 export type PacketConstructorOptions<
@@ -35,7 +35,7 @@ export abstract class Packet {
   /**
    * Single-byte id for this type of packet
    */
-  abstract id(): number
+  abstract id(): PacketType
   /**
    * The size of this packet in bytes, including the id
    */
