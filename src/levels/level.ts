@@ -58,7 +58,12 @@ export class Level {
           const spawnPitch = buf.readInt8(0x0f)
           const nameLength = buf.readUInt16BE(0x10)
           const name = buf.subarray(0x12, 0x12 + nameLength).toString('utf-8')
-          const blocks = [...buf.subarray(0x12 + nameLength)]
+          const blocks = [...buf.subarray(0x12 + nameLength)].map(
+            Block.find.bind(Block)
+          )
+          if (blocks.some(block => block === undefined)) {
+            throw new Error('Invalid block')
+          }
           // TODO: Validate level data
           level = new Level(
             name,
@@ -72,7 +77,7 @@ export class Level {
               rotx: spawnYaw,
               roty: spawnPitch
             },
-            blocks
+            blocks as Block[]
           )
           break
         }
@@ -99,10 +104,14 @@ export class Level {
     // TODO: If a level with this name already exists, just return it with a warning.
     // TODO: Separate out level generation
 
-    const blocks: number[] = new Array(width * height * depth).fill(
-      Block.AIR.id
-    ) as number[]
-    blocks[0] = blocks[1] = blocks[4] = blocks[5] = Block.GRASS.id
+    const blocks: Block[] = new Array(width * height * depth).fill(
+      Block.AIR
+    ) as Block[]
+    for (let x = 0; x < width; ++x) {
+      for (let z = 0; z < depth; ++z) {
+        blocks[this.indexAt(x, 0, z, height, depth)] = Block.GRASS
+      }
+    }
     const lvl = new Level(name, width, height, depth, spawn, blocks)
     await lvl.save()
     return lvl
@@ -112,13 +121,23 @@ export class Level {
     return `${createHash('md5').update(name).digest('hex')}.mcs`
   }
 
+  private static indexAt(
+    x: number,
+    y: number,
+    z: number,
+    height: number,
+    depth: number
+  ): number {
+    return x * height * depth + y * depth + z
+  }
+
   private constructor(
     public name: string,
     public width: number,
     public height: number,
     public depth: number,
     readonly spawn: SpawnPosition,
-    readonly blocks: number[]
+    readonly blocks: Block[]
   ) {}
 
   async save() {
@@ -137,7 +156,7 @@ export class Level {
     buffer.writeUInt16BE(this.name.length, 0x10)
     buffer.write(this.name, 0x12, 'utf-8')
     for (let i = 0; i < mapSize; ++i) {
-      buffer.writeInt8(this.blocks[i], 0x12 + this.name.length + i)
+      buffer.writeInt8(this.blocks[i].id, 0x12 + this.name.length + i)
     }
     const filename = Level.filenameForLevel(this.name)
     const path = join(LEVEL_FOLDER, filename)
@@ -151,7 +170,7 @@ export class Level {
   }
 
   blockAt(x: number, y: number, z: number): Block | undefined {
-    return Block.allBlocks.get(this.blocks[this.indexAt(x, y, z)])
+    return this.blocks[this.indexAt(x, y, z)]
   }
 
   private indexAt(x: number, y: number, z: number): number {

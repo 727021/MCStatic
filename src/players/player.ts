@@ -1,9 +1,12 @@
 import { Socket } from 'node:net'
+import { promisify } from 'node:util'
+import { gzip as _gzip } from 'node:zlib'
 
 import { Block } from '../blocks'
 import { PacketType, PlayerType } from '../constants'
 import { Level } from '../levels'
 import {
+  ByteArray,
   DespawnPlayer,
   DisconnectPlayer,
   LevelDataChunk,
@@ -21,6 +24,8 @@ import {
 } from '../protocol'
 import { Server } from '../server'
 import * as log from '../utils/debug'
+
+const gzip = promisify(_gzip)
 
 // Server -> Client
 // [X] despawn-player
@@ -119,9 +124,9 @@ export class Player {
     this.socket.write(packet.toBytes())
   }
 
-  sendLevelDataChunk(chunk: Block[], percent: number) {
+  sendLevelDataChunk(chunk: number[] | Buffer, percent: number) {
     const packet = new LevelDataChunk({
-      chunkData: chunk.map(c => c.shownAs.id),
+      chunkData: Buffer.isBuffer(chunk) ? [...chunk] : chunk,
       chunkLength: chunk.length,
       percentComplete: percent
     })
@@ -211,4 +216,26 @@ export class Player {
     this.sendLevelInitialize()
   }
   //#endregion
+
+  async sendLevel(level: Level) {
+    this.sendLevelInitialize()
+    const size = Buffer.allocUnsafe(4)
+    size.writeInt32BE(level.blocks.length)
+    const levelData = Buffer.concat([
+      size,
+      Buffer.from(level.blocks.map(block => block.shownAs.id))
+    ])
+    const gzipped = await gzip(levelData)
+    const chunks = Math.ceil(gzipped.length / ByteArray.SIZE)
+    for (let i = 0; i < chunks; ++i) {
+      this.sendLevelDataChunk(
+        gzipped.subarray(
+          ByteArray.SIZE * i,
+          ByteArray.SIZE * i + ByteArray.SIZE
+        ),
+        Math.ceil(((i + 1) / chunks) * 100)
+      )
+    }
+    this.sendLevelFinalize(level)
+  }
 }
