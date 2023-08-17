@@ -1,6 +1,5 @@
-- [ ] Finish packet classes
-- [ ] Refactor duplicate packet classes
-- [ ] Set up jest
+- [X] Finish packet classes
+- [X] Refactor duplicate packet classes
 - [ ] Player
 - [ ] Server
 - [ ] Write readme
