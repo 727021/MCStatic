@@ -12,5 +12,8 @@ module.exports = {
   parserOptions: {
     project: ['./tsconfig.json', './tsconfig.eslint.json']
   },
-  plugins: ['@typescript-eslint']
+  plugins: ['@typescript-eslint'],
+  rules: {
+    'no-console': 'warn'
+  }
 }

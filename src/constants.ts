@@ -1,4 +1,8 @@
+import { join } from 'node:path'
+
 export const PROTOCOL_VERSION = 0x07
+export const MCS_MAGIC_NUMBER = 0x72
+export const LEVEL_FOLDER = join(process.cwd(), 'levels')
 
 export enum PacketDirection {
   SERVER_TO_CLIENT,

@@ -1,11 +1,15 @@
 import { createHash } from 'node:crypto'
+import { existsSync } from 'node:fs'
+import { mkdir } from 'node:fs/promises'
 import { Server as TCPServer, createServer } from 'node:net'
 
 import { generate } from 'randomstring'
 
+import { LEVEL_FOLDER } from '../constants'
 import { Level } from '../levels'
 import { Player } from '../players'
 import { PluginManager } from '../plugins'
+import * as log from '../utils/debug'
 
 export class Server {
   static #s: Server | undefined
@@ -40,6 +44,10 @@ export class Server {
 
   async start() {
     // TODO: Do other setup (load/create config, load main level, connect to db, etc.)
+    if (!existsSync(LEVEL_FOLDER)) {
+      await mkdir(LEVEL_FOLDER)
+    }
+    // TODO: Get main level info from settings
     this.level = (await (Level.exists('main')
       ? Level.load('main')
       : Level.create({
@@ -60,7 +68,7 @@ export class Server {
         try {
           new Player(socket)
         } catch (error) {
-          console.error((error as Error)?.message ?? `Error`)
+          log.error((error as Error)?.message ?? 'Error')
         }
       })
 
@@ -72,7 +80,13 @@ export class Server {
         }
       })
       this.tcp.listen(25565, () => {
-        console.log('Server listening on', this.tcp.address())
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const address = this.tcp.address()!
+        const addressStr =
+          typeof address === 'string'
+            ? address
+            : `${address.address}:${address.port}`
+        log.log(`Server listening on ${addressStr}`)
         resolve()
       })
     })
@@ -96,7 +110,7 @@ export class Server {
         if (err) {
           return reject(err)
         }
-        console.log('Server closed')
+        log.log('Server closed')
         resolve()
       })
     })

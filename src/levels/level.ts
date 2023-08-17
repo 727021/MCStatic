@@ -4,9 +4,8 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { Block } from '../blocks'
-
-const MCS_MAGIC_NUMBER = 0x72
-const LEVEL_FOLDER = join(process.cwd(), 'levels')
+import { LEVEL_FOLDER, MCS_MAGIC_NUMBER } from '../constants'
+import * as log from '../utils/debug'
 
 export type SpawnPosition = {
   x: number
@@ -84,7 +83,7 @@ export class Level {
       return level
     } catch (error) {
       // TODO: Error handling/logging
-      console.error(error)
+      log.error(error)
     }
 
     return
