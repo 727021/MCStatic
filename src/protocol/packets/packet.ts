@@ -47,7 +47,7 @@ export type ServerPacketConstructorOptions<
   T extends { [key: string]: unknown } = { [key: string]: unknown }
 > = T
 export abstract class ServerPacket extends Packet {
-  constructor(options: ServerPacketConstructorOptions = {}) {
+  constructor() {
     super()
   }
 }
@@ -57,5 +57,9 @@ export type ClientPacketConstructorOptions =
 export abstract class ClientPacket extends Packet {
   constructor({ raw }: ClientPacketConstructorOptions) {
     super({ raw })
+  }
+
+  toBytes() {
+    return Buffer.allocUnsafe(0)
   }
 }

@@ -87,9 +87,7 @@ export class Server {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const address = this.tcp.address()!
           const addressStr =
-            typeof address === 'string'
-              ? address
-              : `${address.address}:${PORT}`
+            typeof address === 'string' ? address : `${address.address}:${PORT}`
           if (ip) {
             log.log(`Server listening on ${ip}:${PORT} (${addressStr})`)
           } else {

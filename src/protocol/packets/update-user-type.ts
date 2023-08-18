@@ -12,17 +12,14 @@ type UpdateUserTypeConstructorOptions = ServerPacketConstructorOptions<{
  * This decides if the player can delete bedrock.
  */
 export class UpdateUserType extends ServerPacket {
-  #playerType!: PlayerType
-  get playerType() {
-    return this.#playerType
-  }
+  readonly playerType: PlayerType
 
   constructor({ playerType }: UpdateUserTypeConstructorOptions) {
     super()
     if (playerType === undefined || !(playerType in PlayerType)) {
       throw new Error('Invalid playerType')
     }
-    this.#playerType = playerType
+    this.playerType = playerType
   }
 
   id() {

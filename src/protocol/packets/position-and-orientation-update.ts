@@ -19,30 +19,12 @@ type PositionAndOrientationUpdateConstructorOptions =
  * Not required for server operation.
  */
 export class PositionAndOrientationUpdate extends ServerPacket {
-  #playerId!: number
-  get playerId() {
-    return this.#playerId
-  }
-  #dX!: number
-  get dX() {
-    return this.#dX
-  }
-  #dY!: number
-  get dY() {
-    return this.#dY
-  }
-  #dZ!: number
-  get dZ() {
-    return this.#dZ
-  }
-  #yaw!: number
-  get yaw() {
-    return this.#yaw
-  }
-  #pitch!: number
-  get pitch() {
-    return this.#pitch
-  }
+  readonly playerId: number
+  readonly dX: number
+  readonly dY: number
+  readonly dZ: number
+  readonly yaw: number
+  readonly pitch: number
 
   constructor({
     playerId,
@@ -56,27 +38,27 @@ export class PositionAndOrientationUpdate extends ServerPacket {
     if (playerId === undefined || !SByte.isValid(playerId)) {
       throw new Error('Invalid playerId')
     }
-    this.#playerId = playerId
+    this.playerId = playerId
     if (dX === undefined || !FByte.isValid(dX)) {
       throw new Error('Invalid dX')
     }
-    this.#dX = dX
+    this.dX = dX
     if (dY === undefined || !FByte.isValid(dY)) {
       throw new Error('Invalid dY')
     }
-    this.#dY = dY
+    this.dY = dY
     if (dZ === undefined || !FByte.isValid(dZ)) {
       throw new Error('Invalid dZ')
     }
-    this.#dZ = dZ
+    this.dZ = dZ
     if (yaw === undefined || !Byte.isValid(yaw)) {
       throw new Error('Invalid yaw')
     }
-    this.#yaw = yaw
+    this.yaw = yaw
     if (pitch === undefined || !Byte.isValid(pitch)) {
       throw new Error('Invalid pitch')
     }
-    this.#pitch = pitch
+    this.pitch = pitch
   }
 
   id() {

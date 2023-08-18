@@ -15,41 +15,29 @@ type PositionUpdateConstructorOptions = ServerPacketConstructorOptions<{
  * Not required for server operation.
  */
 export class PositionUpdate extends ServerPacket {
-  #playerId!: number
-  get playerId() {
-    return this.#playerId
-  }
-  #dX!: number
-  get dX() {
-    return this.#dX
-  }
-  #dY!: number
-  get dY() {
-    return this.#dY
-  }
-  #dZ!: number
-  get dZ() {
-    return this.#dZ
-  }
+  readonly playerId: number
+  readonly dX: number
+  readonly dY: number
+  readonly dZ: number
 
   constructor({ playerId, dX, dY, dZ }: PositionUpdateConstructorOptions) {
     super()
     if (playerId === undefined || !SByte.isValid(playerId)) {
       throw new Error('Invalid playerId')
     }
-    this.#playerId = playerId
+    this.playerId = playerId
     if (dX === undefined || !FByte.isValid(dX)) {
       throw new Error('Invalid dX')
     }
-    this.#dX = dX
+    this.dX = dX
     if (dY === undefined || !FByte.isValid(dY)) {
       throw new Error('Invalid dY')
     }
-    this.#dY = dY
+    this.dY = dY
     if (dZ === undefined || !FByte.isValid(dZ)) {
       throw new Error('Invalid dZ')
     }
-    this.#dZ = dZ
+    this.dZ = dZ
   }
 
   id() {

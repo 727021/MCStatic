@@ -14,17 +14,14 @@ type DisconnectPlayerConstructorOptions = ServerPacketConstructorOptions<{
  * 4. "Cheat detected: Too much lag"
  */
 export class DisconnectPlayer extends ServerPacket {
-  #disconnectReason!: string
-  get disconnectReason() {
-    return this.#disconnectReason
-  }
+  readonly disconnectReason: string
 
   constructor({ disconnectReason }: DisconnectPlayerConstructorOptions) {
     super()
     if (disconnectReason === undefined || !String.isValid(disconnectReason)) {
       throw new Error('Invalid disconnectReason')
     }
-    this.#disconnectReason = disconnectReason
+    this.disconnectReason = disconnectReason
   }
 
   id() {

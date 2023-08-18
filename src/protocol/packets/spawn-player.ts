@@ -17,34 +17,13 @@ type SpawnPlayerConstructorOptions = ServerPacketConstructorOptions<{
  * This will set the player's spawn point.
  */
 export class SpawnPlayer extends ServerPacket {
-  #playerId!: number
-  get playerId() {
-    return this.#playerId
-  }
-  #playerName!: string
-  get playerName() {
-    return this.#playerName
-  }
-  #x!: number
-  get x() {
-    return this.#x
-  }
-  #y!: number
-  get y() {
-    return this.#y
-  }
-  #z!: number
-  get z() {
-    return this.#z
-  }
-  #yaw!: number
-  get yaw() {
-    return this.#yaw
-  }
-  #pitch!: number
-  get pitch() {
-    return this.#pitch
-  }
+  readonly playerId: number
+  readonly playerName: string
+  readonly x: number
+  readonly y: number
+  readonly z: number
+  readonly yaw: number
+  readonly pitch: number
 
   constructor({
     playerId,
@@ -59,31 +38,31 @@ export class SpawnPlayer extends ServerPacket {
     if (playerId === undefined || !SByte.isValid(playerId)) {
       throw new Error('Invalid playerId')
     }
-    this.#playerId = playerId
+    this.playerId = playerId
     if (playerName === undefined || !String.isValid(playerName)) {
       throw new Error('Invalid playerName')
     }
-    this.#playerName = playerName
+    this.playerName = playerName
     if (x === undefined || !FShort.isValid(x)) {
       throw new Error('Invalid x')
     }
-    this.#x = x
+    this.x = x
     if (y === undefined || !FShort.isValid(y)) {
       throw new Error('Invalid y')
     }
-    this.#y = y
+    this.y = y
     if (z === undefined || !FShort.isValid(z)) {
       throw new Error('Invalid z')
     }
-    this.#z = z
+    this.z = z
     if (yaw === undefined || !Byte.isValid(yaw)) {
       throw new Error('Invalid yaw')
     }
-    this.#yaw = yaw
+    this.yaw = yaw
     if (pitch === undefined || !Byte.isValid(pitch)) {
       throw new Error('Invalid pitch')
     }
-    this.#pitch = pitch
+    this.pitch = pitch
   }
 
   id() {

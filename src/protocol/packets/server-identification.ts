@@ -14,18 +14,9 @@ type ServerIdentificationConstructorOptions = ServerPacketConstructorOptions<{
  * The protocol version is 0x07, unless you're using a client below 0.28.
  */
 export class ServerIdentification extends ServerPacket {
-  #serverName!: string
-  get serverName() {
-    return this.#serverName
-  }
-  #serverMotd!: string
-  get serverMotd() {
-    return this.#serverMotd
-  }
-  #playerType!: PlayerType
-  get playerType() {
-    return this.#playerType
-  }
+  readonly serverName: string
+  readonly serverMotd: string
+  readonly playerType: PlayerType
 
   constructor({
     serverName,
@@ -36,15 +27,15 @@ export class ServerIdentification extends ServerPacket {
     if (serverName === undefined || !String.isValid(serverName)) {
       throw new Error('Invalid serverName')
     }
-    this.#serverName = serverName
+    this.serverName = serverName
     if (serverMotd === undefined || !String.isValid(serverMotd)) {
       throw new Error('Invalid serverMotd')
     }
-    this.#serverMotd = serverMotd
+    this.serverMotd = serverMotd
     if (playerType === undefined || !(playerType in PlayerType)) {
       throw new Error('Invalid playerType')
     }
-    this.#playerType = playerType
+    this.playerType = playerType
   }
 
   id() {

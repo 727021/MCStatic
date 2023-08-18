@@ -11,14 +11,8 @@ type MessageConstructorOptions = PacketConstructorOptions<{
  * (See [how chat works](https://wiki.vg/Chat#Old_system) - note that Classic **only** supports color codes.)
  */
 export class Message extends Packet {
-  #playerId!: number
-  get playerId() {
-    return this.#playerId
-  }
-  #message!: string
-  get message() {
-    return this.#message
-  }
+  readonly playerId: number
+  readonly message: string
 
   constructor({ raw, message }: MessageConstructorOptions) {
     super({ raw })
@@ -26,11 +20,11 @@ export class Message extends Packet {
       if (message === undefined || !String.isValid(message)) {
         throw new Error('Invalid message')
       }
-      this.#message = message
-      this.#playerId = 0xff
+      this.message = message
+      this.playerId = 0xff
     } else {
-      this.#playerId = this.reader.readSByte(Byte.SIZE)
-      this.#message = this.reader.readString(Byte.SIZE + SByte.SIZE)
+      this.playerId = this.reader.readSByte(Byte.SIZE)
+      this.message = this.reader.readString(Byte.SIZE + SByte.SIZE)
     }
   }
 

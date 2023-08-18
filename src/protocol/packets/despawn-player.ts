@@ -10,17 +10,14 @@ type DespawnPlayerConstructorOptions = ServerPacketConstructorOptions<{
  * Sent to others when the player disconnects.
  */
 export class DespawnPlayer extends ServerPacket {
-  #playerId!: number
-  get playerId() {
-    return this.#playerId
-  }
+  readonly playerId: number
 
   constructor({ playerId }: DespawnPlayerConstructorOptions) {
     super()
     if (playerId === undefined || !SByte.isValid(playerId)) {
       throw new Error('Invalid playerId')
     }
-    this.#playerId = playerId
+    this.playerId = playerId
   }
 
   id() {

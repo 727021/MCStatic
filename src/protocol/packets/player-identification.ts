@@ -7,14 +7,8 @@ import { PROTOCOL_VERSION, PacketType } from '../../constants'
  * The protocol version is 0x07, unless you're using a client below 0.28.
  */
 export class PlayerIdentification extends ClientPacket {
-  #username!: string
-  get username() {
-    return this.#username
-  }
-  #verificationKey!: string
-  get verificationKey() {
-    return this.#verificationKey
-  }
+  readonly username: string
+  readonly verificationKey: string
 
   constructor({ raw }: ClientPacketConstructorOptions) {
     super({ raw })
@@ -22,8 +16,8 @@ export class PlayerIdentification extends ClientPacket {
     if (protocolVersion !== PROTOCOL_VERSION) {
       throw new Error('Invalid protocol version')
     }
-    this.#username = this.reader.readString(Byte.SIZE + Byte.SIZE)
-    this.#verificationKey = this.reader.readString(
+    this.username = this.reader.readString(Byte.SIZE + Byte.SIZE)
+    this.verificationKey = this.reader.readString(
       Byte.SIZE + Byte.SIZE + String.SIZE
     )
   }
@@ -33,14 +27,5 @@ export class PlayerIdentification extends ClientPacket {
   }
   size() {
     return Byte.SIZE + Byte.SIZE + String.SIZE + String.SIZE + Byte.SIZE
-  }
-  toBytes() {
-    return this.writer
-      .writeByte(this.id())
-      .writeByte(PROTOCOL_VERSION)
-      .writeString(this.username)
-      .writeString(this.verificationKey)
-      .writeByte(0x00) // unused
-      .build()
   }
 }
