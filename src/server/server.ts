@@ -10,6 +10,7 @@ import { Level } from '../levels'
 import { Player } from '../players'
 import { PluginManager } from '../plugins'
 import * as log from '../utils/debug'
+import { getPublicIp } from '../utils/public-ip'
 
 export class Server {
   static #s: Server | undefined
@@ -79,15 +80,23 @@ export class Server {
           })
         }
       })
-      this.tcp.listen(25565, () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const address = this.tcp.address()!
-        const addressStr =
-          typeof address === 'string'
-            ? address
-            : `${address.address}:${address.port}`
-        log.log(`Server listening on ${addressStr}`)
-        resolve()
+      const PORT = 25565
+      this.tcp.listen(PORT, () => {
+        ;(async () => {
+          const ip = await getPublicIp()
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const address = this.tcp.address()!
+          const addressStr =
+            typeof address === 'string'
+              ? address
+              : `${address.address}:${PORT}`
+          if (ip) {
+            log.log(`Server listening on ${ip}:${PORT} (${addressStr})`)
+          } else {
+            log.log(`Server listening on ${addressStr}`)
+          }
+          resolve()
+        })().catch(reject)
       })
     })
   }
