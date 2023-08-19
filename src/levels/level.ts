@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import { Generator } from '.'
 import { Block } from '../blocks'
 import { LEVEL_FOLDER, MCS_MAGIC_NUMBER } from '../constants'
 import { PlayerPos } from '../players/player-pos'
@@ -13,7 +14,7 @@ export type LevelCreateOptions = {
   width: number
   height: number
   depth: number
-  spawn: PlayerPos
+  type?: string
 }
 
 export class Level {
@@ -86,18 +87,14 @@ export class Level {
     width,
     height,
     depth,
-    spawn
+    type = 'flat'
   }: LevelCreateOptions): Promise<Level> {
     // TODO: If a level with this name already exists, just return it with a warning.
-    // TODO: Separate out level generation
 
-    const blocks: Block[] = new Array(width * height * depth).fill(
-      Block.AIR
-    ) as Block[]
-    for (let x = 0; x < width; ++x) {
-      for (let z = 0; z < depth; ++z) {
-        blocks[this.indexAt(x, 0, z, width, depth)] = Block.GRASS
-      }
+    const { blocks, spawn } =
+      Generator.generate(type, width, height, depth) ?? {}
+    if (!blocks || !spawn) {
+      throw new Error('Level creation failed')
     }
     const lvl = new Level(name, width, height, depth, spawn, blocks)
     await lvl.save()
@@ -108,7 +105,7 @@ export class Level {
     return `${createHash('md5').update(name).digest('hex')}.mcs`
   }
 
-  private static indexAt(
+  static indexAt(
     x: number,
     y: number,
     z: number,

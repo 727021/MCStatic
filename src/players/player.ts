@@ -252,6 +252,12 @@ export class Player {
     }
     this.sendLevelFinalize(level)
     this.pos = level.spawn
-    this.sendSpawnPlayer(this)
+    Player.sendSpawn(this)
+  }
+
+  static sendSpawn(spawned: Player) {
+    Player.#players.forEach(player => {
+      player.sendSpawnPlayer(spawned)
+    })
   }
 }

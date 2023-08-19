@@ -5,11 +5,9 @@ import { Server as TCPServer, createServer } from 'node:net'
 
 import { generate } from 'randomstring'
 
-import { BlockPos } from '../blocks/block-pos'
 import { LEVEL_FOLDER } from '../constants'
 import { Level } from '../levels'
 import { Player } from '../players'
-import { PlayerPos } from '../players/player-pos'
 import { PluginManager } from '../plugins'
 import * as log from '../utils/debug'
 import { getPublicIp } from '../utils/public-ip'
@@ -57,8 +55,7 @@ export class Server {
           name: 'main',
           width: 16,
           height: 16,
-          depth: 16,
-          spawn: PlayerPos.fromBlockPos(new BlockPos(8, 1, 8), true)
+          depth: 16
         }))) as Level
     return new Promise<void>((resolve, reject) => {
       this.tcp.on('connection', socket => {
@@ -78,6 +75,7 @@ export class Server {
           })
         }
       })
+      // TODO: Get port from settings
       const PORT = 25565
       this.tcp.listen(PORT, () => {
         ;(async () => {
