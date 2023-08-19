@@ -30,8 +30,10 @@ export class PacketWriter {
   }
 
   writeFByte(value: number): typeof this {
-    // TODO
-    throw new Error('Method not implemented.')
+    const raw = Buffer.allocUnsafe(1)
+    raw.writeUInt8(value * 32)
+    this.buf = Buffer.concat([this.buf, raw])
+    return this
   }
 
   writeShort(value: number) {
@@ -42,8 +44,10 @@ export class PacketWriter {
   }
 
   writeFShort(value: number): typeof this {
-    // TODO
-    throw new Error('Method not implemented.')
+    const raw = Buffer.allocUnsafe(2)
+    raw.writeUInt16BE(value * 32)
+    this.buf = Buffer.concat([this.buf, raw])
+    return this
   }
 
   writeString(value: string) {

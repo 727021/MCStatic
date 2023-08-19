@@ -160,7 +160,7 @@ export class Player {
   sendSpawnPlayer(player: Player) {
     this.sendPacket(
       new SpawnPlayer({
-        playerId: player === this ? 0xff : player.id,
+        playerId: player === this ? -1 : player.id,
         playerName: player.name,
         x: player.x,
         y: player.y,
@@ -182,7 +182,7 @@ export class Player {
   sendPositionAndOrientation(player: Player) {
     this.sendPacket(
       new SetPositionAndOrientation({
-        playerId: player === this ? 0xff : player.id,
+        playerId: player === this ? -1 : player.id,
         x: player.x,
         y: player.y,
         z: player.z,
@@ -262,5 +262,11 @@ export class Player {
       )
     }
     this.sendLevelFinalize(level)
+    this.x = level.spawn.x
+    this.y = level.spawn.y
+    this.z = level.spawn.z
+    this.yaw = level.spawn.rotx
+    this.pitch = level.spawn.roty
+    this.sendSpawnPlayer(this)
   }
 }

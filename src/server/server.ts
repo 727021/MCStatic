@@ -57,9 +57,9 @@ export class Server {
           height: 16,
           depth: 16,
           spawn: {
-            x: 4,
+            x: 8.5,
             y: 2,
-            z: 4,
+            z: 8.5,
             rotx: 0,
             roty: 0
           }
