@@ -1,15 +1,18 @@
 /* eslint-disable */
-import { Level } from './levels'
 import { Server } from './server'
+import * as log from './utils/debug'
 
 const server = Server.s
 
-process.on('SIGINT', () => {
-  server.stop()
-})
+const exit = async () => {
+  log.info('Shutting down...')
+  await server.stop()
+  process.exit()
+}
 
-process.on('SIGTERM', () => {
-  server.stop()
-})
+process.once('SIGINT', exit)
+process.once('SIGTERM', exit)
+
+process.on('unhandledRejection', e => log.error(e))
 
 server.start()

@@ -76,7 +76,9 @@ export class Server {
       this.tcp.on('error', (e: Error & { code?: string }) => {
         if (e.code === 'EADDRINUSE') {
           this.tcp.close(err => {
-            reject(err ?? e)
+            log.info('Server is already running')
+            log.debug(err)
+            reject()
           })
         }
       })
@@ -102,11 +104,13 @@ export class Server {
   async stop() {
     // TODO: other cleanup
     // Kick all players
-    await Promise.allSettled(
-      [...Player.connected].map(player => player.kick('Server closed'))
-    )
+    log.info('Kicking all players')
+    await Player.kickAll('Server closed')
+    log.info('Kicked all players')
     // Unload all levels
+    log.info('Unloading levels')
     await Promise.allSettled([...Level.loaded].map(level => level.unload()))
+    log.info('Unloaded levels')
     // Unload all plugins
     await Promise.allSettled(
       [...PluginManager.loaded].map(plugin => plugin.unload())

@@ -13,6 +13,7 @@ import {
   LevelFinalize,
   LevelInitialize,
   Message,
+  Packet,
   PacketReader,
   Ping,
   PlayerIdentification,
@@ -51,9 +52,25 @@ const gzip = promisify(_gzip)
 // [ ] set-position-and-orientation (receive)
 
 export class Player {
-  static #connected: Map<string, Player> = new Map()
-  static get connected(): ReadonlySet<Player> {
-    return new Set(this.#connected.values())
+  static #connections = new Set<Socket>()
+  static get connections(): ReadonlySet<Socket> {
+    return this.#connections
+  }
+
+  static #players = new Set<Player>()
+  static get players(): ReadonlySet<Player> {
+    return this.#players
+  }
+
+  static async kickAll(message: string) {
+    return Promise.all([
+      Promise.allSettled([...this.players].map(player => player.kick(message))),
+      Promise.allSettled(
+        [...this.connections].map(
+          socket => new Promise<void>(resolve => socket.end(() => resolve()))
+        )
+      )
+    ])
   }
 
   // TODO
@@ -69,112 +86,110 @@ export class Player {
 
   constructor(private readonly socket: Socket) {
     log.info(`New connection from ${socket.remoteAddress ?? '(unknown)'}`)
+    Player.#connections.add(socket)
     socket.on('data', data => {
       // TODO: error handling
       this.handleRawPacket(data)
     })
     socket.on('end', () => {
       log.info(`${socket.remoteAddress ?? '(unknown)'} disconnected`)
+      Player.#connections.delete(socket)
       // TODO: Player disconnected
     })
     // this.sendDisconnectPlayer('nope!')
     // socket.end(() => console.log('socket closed'))
   }
 
-  async kick(message: string) {
-    this.sendDisconnectPlayer(message)
-    // TODO despawn this player for other players, send chat message
-    return new Promise<void>(resolve => {
-      this.socket.end(() => resolve())
-    })
+  //#region Send raw packets
+  private sendPacket(packet: Packet) {
+    log.packet(`Sending packet with id 0x${packet.id().toString(16)}`)
+    log.raw(packet)
+    this.socket.write(packet.toBytes())
   }
 
-  //#region Send raw packets
   sendPing() {
-    const packet = new Ping()
-    this.socket.write(packet.toBytes())
+    this.sendPacket(new Ping())
   }
 
   sendServerIdentification() {
-    const packet = new ServerIdentification({
-      serverName: Server.s.name,
-      serverMotd: Server.s.motd,
-      playerType: PlayerType.NORMAL // TODO: figure out where to store ops
-    })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(
+      new ServerIdentification({
+        serverName: Server.s.name,
+        serverMotd: Server.s.motd,
+        playerType: PlayerType.NORMAL // TODO: figure out where to store ops
+      })
+    )
   }
 
   sendMessage(message: string) {
-    const packet = new Message({ message })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(new Message({ message }))
   }
 
   sendDisconnectPlayer(reason: string) {
-    const packet = new DisconnectPlayer({ disconnectReason: reason })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(new DisconnectPlayer({ disconnectReason: reason }))
   }
 
   sendDespawnPlayer(player: Player) {
-    const packet = new DespawnPlayer({ playerId: player.id })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(new DespawnPlayer({ playerId: player.id }))
   }
 
   sendLevelInitialize() {
-    const packet = new LevelInitialize()
-    this.socket.write(packet.toBytes())
+    this.sendPacket(new LevelInitialize())
   }
 
   sendLevelDataChunk(chunk: number[] | Buffer, percent: number) {
-    const packet = new LevelDataChunk({
-      chunkData: Buffer.isBuffer(chunk) ? [...chunk] : chunk,
-      chunkLength: chunk.length,
-      percentComplete: percent
-    })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(
+      new LevelDataChunk({
+        chunkData: Buffer.isBuffer(chunk) ? [...chunk] : chunk,
+        chunkLength: chunk.length,
+        percentComplete: percent
+      })
+    )
   }
 
   sendLevelFinalize(level: Level) {
-    const packet = new LevelFinalize({
-      xSize: level.width,
-      ySize: level.height,
-      zSize: level.depth
-    })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(
+      new LevelFinalize({
+        xSize: level.width,
+        ySize: level.height,
+        zSize: level.depth
+      })
+    )
   }
 
   sendSpawnPlayer(player: Player) {
-    const packet = new SpawnPlayer({
-      playerId: player === this ? 0xff : player.id,
-      playerName: player.name,
-      x: player.x,
-      y: player.y,
-      z: player.z,
-      yaw: player.yaw,
-      pitch: player.pitch
-    })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(
+      new SpawnPlayer({
+        playerId: player === this ? 0xff : player.id,
+        playerName: player.name,
+        x: player.x,
+        y: player.y,
+        z: player.z,
+        yaw: player.yaw,
+        pitch: player.pitch
+      })
+    )
   }
 
   sendSetBlock(blockType: Block, x: number, y: number, z: number) {
-    const packet = new SetBlockServer({ blockType, x, y, z })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(new SetBlockServer({ blockType, x, y, z }))
   }
 
   sendUpdateUserType(playerType: PlayerType) {
-    const packet = new UpdateUserType({ playerType })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(new UpdateUserType({ playerType }))
   }
 
   sendPositionAndOrientation(player: Player) {
-    const packet = new SetPositionAndOrientation({
-      playerId: player === this ? 0xff : player.id,
-      x: player.x,
-      y: player.y,
-      z: player.z,
-      yaw: player.yaw,
-      pitch: player.pitch
-    })
-    this.socket.write(packet.toBytes())
+    this.sendPacket(
+      new SetPositionAndOrientation({
+        playerId: player === this ? 0xff : player.id,
+        x: player.x,
+        y: player.y,
+        z: player.z,
+        yaw: player.yaw,
+        pitch: player.pitch
+      })
+    )
   }
   //#endregion
 
@@ -213,9 +228,19 @@ export class Player {
       return
     }
     this.sendServerIdentification()
-    this.sendLevelInitialize()
+    Player.#players.add(this)
+    Player.#connections.delete(this.socket)
+    this.sendLevel(Server.s.level).catch(log.error)
   }
   //#endregion
+
+  async kick(message: string) {
+    this.sendDisconnectPlayer(message)
+    // TODO despawn this player for other players, send chat message
+    return new Promise<void>(resolve => {
+      this.socket.end(() => resolve())
+    })
+  }
 
   async sendLevel(level: Level) {
     this.sendLevelInitialize()

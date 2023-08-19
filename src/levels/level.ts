@@ -109,7 +109,7 @@ export class Level {
     ) as Block[]
     for (let x = 0; x < width; ++x) {
       for (let z = 0; z < depth; ++z) {
-        blocks[this.indexAt(x, 0, z, height, depth)] = Block.GRASS
+        blocks[this.indexAt(x, 0, z, width, depth)] = Block.GRASS
       }
     }
     const lvl = new Level(name, width, height, depth, spawn, blocks)
@@ -125,10 +125,10 @@ export class Level {
     x: number,
     y: number,
     z: number,
-    height: number,
+    width: number,
     depth: number
   ): number {
-    return x * height * depth + y * depth + z
+    return x + width * z + width * depth * y
   }
 
   private constructor(
@@ -174,6 +174,6 @@ export class Level {
   }
 
   private indexAt(x: number, y: number, z: number): number {
-    return x * this.height * this.depth + y * this.depth + z
+    return x + this.width * z + this.width * this.depth * y
   }
 }
