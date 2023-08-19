@@ -1,6 +1,7 @@
 import { ClientPacket, ClientPacketConstructorOptions } from '.'
 import { Byte, Short } from '..'
 import { Block } from '../../blocks'
+import { BlockPos } from '../../blocks/block-pos'
 import { BlockChangeMode, PacketType } from '../../constants'
 
 /**
@@ -12,17 +13,16 @@ import { BlockChangeMode, PacketType } from '../../constants'
  * To disallow block creation, server must send back Set Block packet with the old block type.
  */
 export class SetBlockClient extends ClientPacket {
- readonly x: number
- readonly y: number
- readonly z: number
- readonly mode: BlockChangeMode
- readonly blockType: Block
+  readonly blockPos: BlockPos
+  readonly mode: BlockChangeMode
+  readonly blockType: Block
 
   constructor({ raw }: ClientPacketConstructorOptions) {
     super({ raw })
-    this.x = this.reader.readShort(Byte.SIZE)
-    this.y = this.reader.readShort(Byte.SIZE + Short.SIZE)
-    this.z = this.reader.readShort(Byte.SIZE + Short.SIZE + Short.SIZE)
+    const x = this.reader.readShort(Byte.SIZE)
+    const y = this.reader.readShort(Byte.SIZE + Short.SIZE)
+    const z = this.reader.readShort(Byte.SIZE + Short.SIZE + Short.SIZE)
+    this.blockPos = new BlockPos(x, y, z)
     const mode = this.reader.readByte(
       Byte.SIZE + Short.SIZE + Short.SIZE + Short.SIZE
     )

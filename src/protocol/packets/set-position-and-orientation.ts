@@ -1,14 +1,11 @@
 import { Packet, PacketConstructorOptions } from '.'
 import { Byte, FShort, SByte } from '..'
 import { PacketDirection, PacketType } from '../../constants'
+import { PlayerPos } from '../../players/player-pos'
 
 type SetPositionAndOrientationConstructorOptions = PacketConstructorOptions<{
   playerId: number
-  x: number
-  y: number
-  z: number
-  yaw: number
-  pitch: number
+  playerPos: PlayerPos
 }>
 
 /**
@@ -19,20 +16,12 @@ type SetPositionAndOrientationConstructorOptions = PacketConstructorOptions<{
  */
 export class SetPositionAndOrientation extends Packet {
   readonly playerId: number
-  readonly x: number
-  readonly y: number
-  readonly z: number
-  readonly yaw: number
-  readonly pitch: number
+  readonly playerPos: PlayerPos
 
   constructor({
     raw,
     playerId,
-    x,
-    y,
-    z,
-    yaw,
-    pitch
+    playerPos
   }: SetPositionAndOrientationConstructorOptions) {
     super({ raw })
     if (this.direction === PacketDirection.SERVER_TO_CLIENT) {
@@ -40,37 +29,21 @@ export class SetPositionAndOrientation extends Packet {
         throw new Error('Invalid playerId')
       }
       this.playerId = playerId
-      if (x === undefined || !FShort.isValid(x)) {
-        throw new Error('Invalid x')
+      if (playerPos === undefined) {
+        throw new Error('Invalid playerPos')
       }
-      this.x = x
-      if (y === undefined || !FShort.isValid(y)) {
-        throw new Error('Invalid y')
-      }
-      this.y = y
-      if (z === undefined || !FShort.isValid(z)) {
-        throw new Error('Invalid z')
-      }
-      this.z = z
-      if (yaw === undefined || !Byte.isValid(yaw)) {
-        throw new Error('Invalid yaw')
-      }
-      this.yaw = yaw
-      if (pitch === undefined || !Byte.isValid(pitch)) {
-        throw new Error('Invalid pitch')
-      }
-      this.pitch = pitch
+      this.playerPos = playerPos
     } else {
       this.playerId = this.reader.readSByte(Byte.SIZE)
-      this.x = this.reader.readFShort(Byte.SIZE + SByte.SIZE)
-      this.y = this.reader.readFShort(Byte.SIZE + SByte.SIZE + FShort.SIZE)
-      this.z = this.reader.readFShort(
+      const x = this.reader.readFShort(Byte.SIZE + SByte.SIZE)
+      const y = this.reader.readFShort(Byte.SIZE + SByte.SIZE + FShort.SIZE)
+      const z = this.reader.readFShort(
         Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE
       )
-      this.yaw = this.reader.readByte(
+      const yaw = this.reader.readByte(
         Byte.SIZE + SByte.SIZE + FShort.SIZE + FShort.SIZE + FShort.SIZE
       )
-      this.pitch = this.reader.readByte(
+      const pitch = this.reader.readByte(
         Byte.SIZE +
           SByte.SIZE +
           FShort.SIZE +
@@ -78,6 +51,7 @@ export class SetPositionAndOrientation extends Packet {
           FShort.SIZE +
           Byte.SIZE
       )
+      this.playerPos = new PlayerPos(x, y, z, yaw, pitch)
     }
   }
 
@@ -99,11 +73,11 @@ export class SetPositionAndOrientation extends Packet {
     return this.writer
       .writeByte(this.id())
       .writeSByte(this.playerId)
-      .writeFShort(this.x)
-      .writeFShort(this.y)
-      .writeFShort(this.z)
-      .writeByte(this.yaw)
-      .writeByte(this.pitch)
+      .writeFShort(this.playerPos.x)
+      .writeFShort(this.playerPos.y)
+      .writeFShort(this.playerPos.z)
+      .writeByte(this.playerPos.yaw)
+      .writeByte(this.playerPos.pitch)
       .build()
   }
 }

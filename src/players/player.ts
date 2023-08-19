@@ -3,6 +3,7 @@ import { promisify } from 'node:util'
 import { gzip as _gzip } from 'node:zlib'
 
 import { Block } from '../blocks'
+import { BlockPos } from '../blocks/block-pos'
 import { PacketType, PlayerType } from '../constants'
 import { Level } from '../levels'
 import {
@@ -25,6 +26,7 @@ import {
 } from '../protocol'
 import { Server } from '../server'
 import * as log from '../utils/debug'
+import { PlayerPos } from './player-pos'
 
 const gzip = promisify(_gzip)
 
@@ -77,11 +79,7 @@ export class Player {
   key!: string
   name!: string
   id!: number
-  x!: number
-  y!: number
-  z!: number
-  yaw!: number
-  pitch!: number
+  pos!: PlayerPos
   level!: Level
 
   constructor(private readonly socket: Socket) {
@@ -94,10 +92,9 @@ export class Player {
     socket.on('end', () => {
       log.info(`${socket.remoteAddress ?? '(unknown)'} disconnected`)
       Player.#connections.delete(socket)
-      // TODO: Player disconnected
+      Player.#players.delete(this)
+      // TODO: despawn player for other players if not already done
     })
-    // this.sendDisconnectPlayer('nope!')
-    // socket.end(() => console.log('socket closed'))
   }
 
   //#region Send raw packets
@@ -162,17 +159,13 @@ export class Player {
       new SpawnPlayer({
         playerId: player === this ? -1 : player.id,
         playerName: player.name,
-        x: player.x,
-        y: player.y,
-        z: player.z,
-        yaw: player.yaw,
-        pitch: player.pitch
+        playerPos: player.pos
       })
     )
   }
 
-  sendSetBlock(blockType: Block, x: number, y: number, z: number) {
-    this.sendPacket(new SetBlockServer({ blockType, x, y, z }))
+  sendSetBlock(blockType: Block, blockPos: BlockPos) {
+    this.sendPacket(new SetBlockServer({ blockType, blockPos }))
   }
 
   sendUpdateUserType(playerType: PlayerType) {
@@ -183,11 +176,7 @@ export class Player {
     this.sendPacket(
       new SetPositionAndOrientation({
         playerId: player === this ? -1 : player.id,
-        x: player.x,
-        y: player.y,
-        z: player.z,
-        yaw: player.yaw,
-        pitch: player.pitch
+        playerPos: player.pos
       })
     )
   }
@@ -262,11 +251,7 @@ export class Player {
       )
     }
     this.sendLevelFinalize(level)
-    this.x = level.spawn.x
-    this.y = level.spawn.y
-    this.z = level.spawn.z
-    this.yaw = level.spawn.rotx
-    this.pitch = level.spawn.roty
+    this.pos = level.spawn
     this.sendSpawnPlayer(this)
   }
 }

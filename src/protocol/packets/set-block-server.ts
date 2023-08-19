@@ -1,12 +1,11 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, Short } from '..'
 import { Block } from '../../blocks'
+import { BlockPos } from '../../blocks/block-pos'
 import { PacketType } from '../../constants'
 
 type SetBlockConstructorOptions = ServerPacketConstructorOptions<{
-  x: number
-  y: number
-  z: number
+  blockPos: BlockPos
   blockType: Block
 }>
 
@@ -15,25 +14,12 @@ type SetBlockConstructorOptions = ServerPacketConstructorOptions<{
  * In the case of a player change, the server will also echo the block change back to the player who initiated it.
  */
 export class SetBlockServer extends ServerPacket {
- readonly x: number
- readonly y: number
- readonly z: number
- readonly blockType: Block
+  readonly blockPos: BlockPos
+  readonly blockType: Block
 
-  constructor({ x, y, z, blockType }: SetBlockConstructorOptions) {
+  constructor({ blockPos, blockType }: SetBlockConstructorOptions) {
     super()
-    if (x === undefined || !Short.isValid(x)) {
-      throw new Error('Invalid x')
-    }
-    this.x = x
-    if (y === undefined || !Short.isValid(y)) {
-      throw new Error('Invalid y')
-    }
-    this.y = y
-    if (z === undefined || !Short.isValid(z)) {
-      throw new Error('Invalid z')
-    }
-    this.z = z
+    this.blockPos = blockPos
     const block = Block.find(blockType?.id)
     if (!block) {
       throw new Error('Invalid blockType')
@@ -50,9 +36,9 @@ export class SetBlockServer extends ServerPacket {
   toBytes() {
     return this.writer
       .writeByte(this.id())
-      .writeShort(this.x)
-      .writeShort(this.y)
-      .writeShort(this.z)
+      .writeShort(this.blockPos.x)
+      .writeShort(this.blockPos.y)
+      .writeShort(this.blockPos.z)
       .writeByte(this.blockType.shownAs.id)
       .build()
   }

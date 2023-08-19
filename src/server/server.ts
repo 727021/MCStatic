@@ -5,9 +5,11 @@ import { Server as TCPServer, createServer } from 'node:net'
 
 import { generate } from 'randomstring'
 
+import { BlockPos } from '../blocks/block-pos'
 import { LEVEL_FOLDER } from '../constants'
 import { Level } from '../levels'
 import { Player } from '../players'
+import { PlayerPos } from '../players/player-pos'
 import { PluginManager } from '../plugins'
 import * as log from '../utils/debug'
 import { getPublicIp } from '../utils/public-ip'
@@ -46,7 +48,7 @@ export class Server {
   async start() {
     // TODO: Do other setup (load/create config, load main level, connect to db, etc.)
     if (!existsSync(LEVEL_FOLDER)) {
-      await mkdir(LEVEL_FOLDER)
+      await mkdir(LEVEL_FOLDER, { recursive: true })
     }
     // TODO: Get main level info from settings
     this.level = (await (Level.exists('main')
@@ -56,13 +58,7 @@ export class Server {
           width: 16,
           height: 16,
           depth: 16,
-          spawn: {
-            x: 8.5,
-            y: 2,
-            z: 8.5,
-            rotx: 0,
-            roty: 0
-          }
+          spawn: PlayerPos.fromBlockPos(new BlockPos(8, 1, 8), true)
         }))) as Level
     return new Promise<void>((resolve, reject) => {
       this.tcp.on('connection', socket => {

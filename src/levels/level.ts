@@ -5,22 +5,15 @@ import { join } from 'node:path'
 
 import { Block } from '../blocks'
 import { LEVEL_FOLDER, MCS_MAGIC_NUMBER } from '../constants'
+import { PlayerPos } from '../players/player-pos'
 import * as log from '../utils/debug'
-
-export type SpawnPosition = {
-  x: number
-  y: number
-  z: number
-  rotx: number
-  roty: number
-}
 
 export type LevelCreateOptions = {
   name: string
   width: number
   height: number
   depth: number
-  spawn: SpawnPosition
+  spawn: PlayerPos
 }
 
 export class Level {
@@ -70,13 +63,7 @@ export class Level {
             width,
             height,
             depth,
-            {
-              x: spawnX,
-              y: spawnY,
-              z: spawnZ,
-              rotx: spawnYaw,
-              roty: spawnPitch
-            },
+            new PlayerPos(spawnX, spawnY, spawnZ, spawnYaw, spawnPitch),
             blocks as Block[]
           )
           break
@@ -136,7 +123,7 @@ export class Level {
     public width: number,
     public height: number,
     public depth: number,
-    readonly spawn: SpawnPosition,
+    readonly spawn: PlayerPos,
     readonly blocks: Block[]
   ) {}
 
@@ -151,8 +138,8 @@ export class Level {
     buffer.writeUint16BE(this.spawn.x, 0x08)
     buffer.writeUint16BE(this.spawn.y, 0x0a)
     buffer.writeUint16BE(this.spawn.z, 0x0c)
-    buffer.writeInt8(this.spawn.rotx, 0x0e)
-    buffer.writeInt8(this.spawn.roty, 0x0f)
+    buffer.writeInt8(this.spawn.yaw, 0x0e)
+    buffer.writeInt8(this.spawn.pitch, 0x0f)
     buffer.writeUInt16BE(this.name.length, 0x10)
     buffer.write(this.name, 0x12, 'utf-8')
     for (let i = 0; i < mapSize; ++i) {

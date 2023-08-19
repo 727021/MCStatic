@@ -1,15 +1,12 @@
 import { ServerPacket, ServerPacketConstructorOptions } from '.'
 import { Byte, FShort, SByte, String } from '..'
 import { PacketType } from '../../constants'
+import { PlayerPos } from '../../players/player-pos'
 
 type SpawnPlayerConstructorOptions = ServerPacketConstructorOptions<{
   playerId: number
   playerName: string
-  x: number
-  y: number
-  z: number
-  yaw: number
-  pitch: number
+  playerPos: PlayerPos
 }>
 
 /**
@@ -19,50 +16,23 @@ type SpawnPlayerConstructorOptions = ServerPacketConstructorOptions<{
 export class SpawnPlayer extends ServerPacket {
   readonly playerId: number
   readonly playerName: string
-  readonly x: number
-  readonly y: number
-  readonly z: number
-  readonly yaw: number
-  readonly pitch: number
+  readonly playerPos: PlayerPos
 
   constructor({
     playerId,
     playerName,
-    x,
-    y,
-    z,
-    yaw,
-    pitch
+    playerPos
   }: SpawnPlayerConstructorOptions) {
     super()
-    if (playerId === undefined || !SByte.isValid(playerId)) {
+    if (!SByte.isValid(playerId)) {
       throw new Error('Invalid playerId')
     }
     this.playerId = playerId
-    if (playerName === undefined || !String.isValid(playerName)) {
+    if (!String.isValid(playerName)) {
       throw new Error('Invalid playerName')
     }
     this.playerName = playerName
-    if (x === undefined || !FShort.isValid(x)) {
-      throw new Error('Invalid x')
-    }
-    this.x = x
-    if (y === undefined || !FShort.isValid(y)) {
-      throw new Error('Invalid y')
-    }
-    this.y = y
-    if (z === undefined || !FShort.isValid(z)) {
-      throw new Error('Invalid z')
-    }
-    this.z = z
-    if (yaw === undefined || !Byte.isValid(yaw)) {
-      throw new Error('Invalid yaw')
-    }
-    this.yaw = yaw
-    if (pitch === undefined || !Byte.isValid(pitch)) {
-      throw new Error('Invalid pitch')
-    }
-    this.pitch = pitch
+    this.playerPos = playerPos
   }
 
   id() {
@@ -85,11 +55,11 @@ export class SpawnPlayer extends ServerPacket {
       .writeByte(this.id())
       .writeSByte(this.playerId)
       .writeString(this.playerName)
-      .writeFShort(this.x)
-      .writeFShort(this.y)
-      .writeFShort(this.z)
-      .writeByte(this.yaw)
-      .writeByte(this.pitch)
+      .writeFShort(this.playerPos.x)
+      .writeFShort(this.playerPos.y)
+      .writeFShort(this.playerPos.z)
+      .writeByte(this.playerPos.yaw)
+      .writeByte(this.playerPos.pitch)
       .build()
   }
 }

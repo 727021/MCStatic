@@ -31,7 +31,7 @@ export class PacketWriter {
 
   writeFByte(value: number): typeof this {
     const raw = Buffer.allocUnsafe(1)
-    raw.writeUInt8(value * 32)
+    raw.writeUInt8(value)
     this.buf = Buffer.concat([this.buf, raw])
     return this
   }
@@ -45,7 +45,7 @@ export class PacketWriter {
 
   writeFShort(value: number): typeof this {
     const raw = Buffer.allocUnsafe(2)
-    raw.writeUInt16BE(value * 32)
+    raw.writeUInt16BE(value)
     this.buf = Buffer.concat([this.buf, raw])
     return this
   }
